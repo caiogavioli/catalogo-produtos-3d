@@ -20,19 +20,25 @@ Entra:
 - Gravação numa planilha/CSV intermediária (fonte da verdade), editável
   manualmente pelo usuário antes da geração do PDF.
 - Geração de um PDF por categoria e de um PDF completo agrupando tudo.
-- Layout simples: foto(s), descrição e tamanho. Sem preço.
+- Layout simples: foto(s), descrição, tamanho e preço.
+
+Preço não constava da spec original ("sem preço"); foi incluído depois,
+a pedido do usuário, como coluna opcional da planilha — preenchida à mão
+(nunca vem da raspagem) e omitida do PDF quando vazia.
 
 Não entra:
-- Preço, loja online, checkout.
+- Loja online, checkout.
 - Integração com Instagram ou outras redes.
 - Atualização automática/agendada — sempre rodado manualmente pelo usuário.
 
 ## Stack
 
-- Raspagem: Python (ex.: requests/playwright, já que o MakerWorld não tem
-  API pública).
-- Base de dados: planilha/CSV simples.
-- Geração de PDF: Python (ex.: reportlab/weasyprint).
+- Raspagem: Python + Playwright (o MakerWorld é uma SPA e não tem API
+  pública).
+- Base de dados: planilha/CSV simples (`data/catalogo.csv`), preenchível
+  pela raspagem ou à mão — o gerador de PDF só depende do CSV.
+- Geração de PDF: Python + reportlab (escolhido em vez do weasyprint por
+  instalar com pip puro, sem dependências de sistema como cairo/pango).
 - Execução: local, sob demanda, sem backend, sem hospedagem.
 
 ## Riscos conhecidos

@@ -14,7 +14,9 @@ DATA_DIR = RAIZ / "data"
 FOTOS_DIR = DATA_DIR / "fotos"
 CSV_PATH = DATA_DIR / "catalogo.csv"
 
-CSV_COLUNAS = ["categoria", "nome", "descricao", "tamanho", "fotos", "url"]
+# `preco` nunca vem da raspagem (o MakerWorld não tem essa informação) — é
+# preenchido à mão na planilha. Se ficar vazio, não aparece no PDF.
+CSV_COLUNAS = ["categoria", "nome", "descricao", "tamanho", "preco", "fotos", "url"]
 
 TIMEOUT_NAVEGACAO_MS = 20_000
 

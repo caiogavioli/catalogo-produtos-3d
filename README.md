@@ -16,7 +16,8 @@ produtos a clientes. Hoje a única vitrine é um Instagram simples.
 - Base intermediária em planilha/CSV, editável pelo usuário (corte de
   produtos indesejados antes de gerar o PDF).
 - Geração de um PDF por categoria e de um PDF completo agrupando tudo.
-- Sem preço. Sem loja online. Execução local, sob demanda.
+- Preço é uma coluna opcional da planilha, preenchida à mão. Sem loja
+  online. Execução local, sob demanda.
 
 Spec completa da decisão: ver `projetos/catalogo-produtos-3d.md` no
 repositório [caiogavioli/Brainstorm](https://github.com/caiogavioli/Brainstorm).
@@ -60,7 +61,37 @@ scraper trata como categoria de cada produto.
 3. Revisar `data/catalogo.csv` — a raspagem é best-effort (em especial o
    campo `tamanho` e as fotos extras além da capa), então vale conferir
    antes de gerar o PDF, e remover produtos que não quer manter.
-4. Rodar a geração de PDF: gera os arquivos em `output/`.
+
+### A planilha (`data/catalogo.csv`)
+
+É a fonte da verdade do catálogo. Pode ser preenchida pela raspagem, à
+mão (Excel / Google Sheets / LibreOffice), ou pelos dois — o gerador de
+PDF não sabe de onde ela veio.
+
+| coluna | o que é |
+| --- | --- |
+| `categoria` | agrupa os produtos; vira um PDF por categoria |
+| `nome` | nome do produto (linhas sem nome são ignoradas) |
+| `descricao` | texto que aparece no catálogo |
+| `tamanho` | ex.: `120 x 80 x 45 mm` |
+| `preco` | opcional — se ficar vazio, não aparece no PDF |
+| `fotos` | caminhos relativos à raiz do projeto, separados por `;` |
+| `url` | link do modelo no MakerWorld (não aparece no PDF) |
+
+Só `nome` é obrigatório. As demais colunas podem ficar vazias — ou até
+ausentes, se você montar a planilha do zero.
+
+### Geração do PDF (`data/catalogo.csv` -> `output/`)
+
+```
+python -m pdf
+```
+
+Gera um `catalogo-<categoria>.pdf` para cada categoria e um
+`catalogo-completo.pdf` com tudo, dentro de `output/`.
+
+Flags úteis: `--csv <caminho>` e `--saida <pasta>` para usar arquivos
+fora do padrão.
 
 ### Testes
 
@@ -71,5 +102,6 @@ pytest
 
 ## Status
 
-Scraper do MakerWorld implementado (`scraper/`). Geração de PDF ainda não
-implementada (`pdf/`).
+Scraper do MakerWorld (`scraper/`) e geração de PDF (`pdf/`)
+implementados. Os seletores do scraper ainda não foram validados contra
+o site real.

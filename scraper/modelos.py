@@ -13,3 +13,5 @@ class Produto:
     tamanho: str
     url: str
     fotos: list[str] = field(default_factory=list)
+    # Preenchido à mão na planilha; a raspagem sempre deixa vazio.
+    preco: str = ""
