@@ -9,9 +9,15 @@ const nextConfig: NextConfig = {
   // Brainstorm) — não deixar o `next dev` anexar o bloco de regras dele.
   agentRules: false,
   images: {
-    remotePatterns: supabaseHost
-      ? [{ protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/public/**" }]
-      : [],
+    remotePatterns: [
+      ...(supabaseHost
+        ? [{ protocol: "https" as const, hostname: supabaseHost, pathname: "/storage/v1/object/public/**" }]
+        : []),
+      // placehold.co: só usado pelas fotos de exemplo/placeholder dos
+      // produtos de demonstração — pode ser removido quando todos os
+      // produtos tiverem foto real (upload pelo painel admin).
+      { protocol: "https", hostname: "placehold.co" },
+    ],
   },
 };
 
