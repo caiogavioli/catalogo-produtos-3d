@@ -1,44 +1,54 @@
-# Catálogo de produtos de impressão 3D
+# CMG3D — Catálogo de produtos de impressão 3D
 
-Gera um catálogo em PDF (por categoria e completo) dos produtos impressos em
-3D, a partir dos dados extraídos da conta do usuário no MakerWorld.
+Site com catálogo público (vitrine) dos produtos impressos em 3D pela CMG3D,
+mais uma área administrativa com login para cadastrar e manter os produtos.
 
 ## Problema
 
 Os modelos ficam organizados em pastas de categoria na conta do MakerWorld,
-mas não existe nenhum documento apresentável para mostrar/vender esses
+mas não existe nenhuma vitrine apresentável para mostrar/vender esses
 produtos a clientes. Hoje a única vitrine é um Instagram simples.
 
 ## Escopo
 
-- Raspagem automática das pastas/categorias do MakerWorld: nome, descrição,
-  tamanho e foto(s) de cada produto.
-- Base intermediária em planilha/CSV, editável pelo usuário (corte de
-  produtos indesejados antes de gerar o PDF).
-- Geração de um PDF por categoria e de um PDF completo agrupando tudo.
-- Sem preço. Sem loja online. Execução local, sob demanda.
+- **Catálogo público**: sem login, navegação por categoria, visual de
+  vitrine na identidade CMG3D. Cada produto mostra foto(s), nome,
+  descrição, tamanho e preço (preço pode ficar em branco).
+- **Área admin**: login para duas pessoas (mesma permissão), cadastro,
+  edição e remoção de produtos e categorias.
+- **Página de cores disponíveis**: lista geral, independente de produto.
+- **Raspagem do MakerWorld** para popular os produtos inicialmente; edição
+  posterior é manual, pelo painel admin.
+- Sem PDF, sem checkout, sem domínio próprio pago — link gratuito do Vercel.
 
 Spec completa da decisão: ver `projetos/catalogo-produtos-3d.md` no
 repositório [caiogavioli/Brainstorm](https://github.com/caiogavioli/Brainstorm).
 
+## Stack
+
+- **Frontend**: Next.js
+- **Hospedagem**: Vercel (domínio gratuito `*.vercel.app`)
+- **Banco de dados + Auth + Storage**: Supabase (grátis no volume esperado)
+- **Raspagem inicial**: script contra o MakerWorld (sem API pública)
+
 ## Estrutura
 
 ```
-scraper/     # script de raspagem do MakerWorld -> data/catalogo.csv
-data/        # planilha/CSV (fonte da verdade) e fotos baixadas
-pdf/         # script de geração dos PDFs a partir do CSV
-output/      # PDFs gerados (por categoria + completo)
+scraper/     # script de raspagem do MakerWorld -> popula o banco (Supabase)
+data/        # dados intermediários/exportados da raspagem, se necessário
+app/         # aplicação Next.js (catálogo público + painel admin) — a criar
 ```
+
+## Identidade visual
+
+Marca: **CMG3D**. Logo em roxo/metálico, estilo moderno — ver arquivo em
+`assets/logo/` (a adicionar). Visual do site: vitrine, cor de marca forte.
 
 ## Como rodar
 
-_A documentar conforme os scripts forem implementados._
-
-1. Rodar a raspagem: popula/atualiza `data/catalogo.csv` e `data/fotos/`.
-2. Revisar `data/catalogo.csv` — remover produtos que não quer manter.
-3. Rodar a geração de PDF: gera os arquivos em `output/`.
+_A documentar conforme a aplicação for implementada._
 
 ## Status
 
-Em construção — esqueleto inicial criado a partir da spec fechada em
+Em construção — esqueleto inicial criado a partir da spec revisada (v2) em
 `caiogavioli/Brainstorm`.

@@ -1,7 +1,15 @@
+# Node / Next.js
+node_modules/
+.next/
+out/
+.env
+.env.local
+
+# Python (scraper)
 __pycache__/
 *.pyc
 .venv/
 venv/
+
+# dados locais
 data/fotos/
-output/
-.env

@@ -4,9 +4,10 @@ Contexto para qualquer sessão do Claude trabalhando neste repositório.
 
 ## O que é este projeto
 
-Ferramenta local (sem servidor, sem custo mensal) que gera um catálogo em
-PDF dos produtos de impressão 3D do usuário, a partir dos dados da conta
-dele no MakerWorld. Mantido e rodado só pelo próprio usuário, sob demanda.
+Site da CMG3D com catálogo público (vitrine) dos produtos de impressão 3D e
+uma área administrativa com login para o usuário e a esposa dele
+cadastrarem/editarem produtos. Substitui a ideia original de gerar PDF —
+agora o compartilhamento com clientes é feito por link do site.
 
 Spec de origem (decisão completa, trade-offs, riscos): repositório
 [caiogavioli/Brainstorm](https://github.com/caiogavioli/Brainstorm),
@@ -15,36 +16,47 @@ arquivo `projetos/catalogo-produtos-3d.md`.
 ## Escopo da v1
 
 Entra:
-- Raspagem automática das pastas/categorias da conta do usuário no
-  MakerWorld: nome, descrição, tamanho e foto(s) de cada produto.
-- Gravação numa planilha/CSV intermediária (fonte da verdade), editável
-  manualmente pelo usuário antes da geração do PDF.
-- Geração de um PDF por categoria e de um PDF completo agrupando tudo.
-- Layout simples: foto(s), descrição e tamanho. Sem preço.
+- Catálogo público, sem login, navegação por categoria, visual "vitrine" na
+  identidade CMG3D (roxo/metálico, moderno). Produto mostra foto(s), nome,
+  descrição, tamanho e preço (opcional, pode ficar em branco).
+- Área admin com login para 2 usuários, mesma permissão total (CRUD de
+  produtos e categorias).
+- Página de cores disponíveis (lista geral, não é atributo por produto).
+- Raspagem do MakerWorld para popular produtos inicialmente; edição
+  posterior é manual pelo painel admin.
 
 Não entra:
-- Preço, loja online, checkout.
-- Integração com Instagram ou outras redes.
-- Atualização automática/agendada — sempre rodado manualmente pelo usuário.
+- Geração de PDF (descontinuada).
+- Checkout/venda dentro do site.
+- Domínio próprio pago — usa domínio gratuito do Vercel.
+- Atualização automática/agendada da raspagem.
 
 ## Stack
 
-- Raspagem: Python (ex.: requests/playwright, já que o MakerWorld não tem
-  API pública).
-- Base de dados: planilha/CSV simples.
-- Geração de PDF: Python (ex.: reportlab/weasyprint).
-- Execução: local, sob demanda, sem backend, sem hospedagem.
+- Frontend: Next.js.
+- Hospedagem: Vercel, domínio `*.vercel.app` gratuito.
+- Banco de dados + autenticação + storage de imagens: Supabase (camada
+  gratuita).
+- Raspagem: script (Python ou Node) contra o MakerWorld, rodado sob
+  demanda, sem API pública disponível.
 
 ## Riscos conhecidos
 
-- MakerWorld não tem API pública: a raspagem depende da estrutura atual da
-  página e pode quebrar se o site mudar o layout. Manutenção ocasional do
-  script é esperada.
-- Validar que a extração é dos dados da própria conta do usuário (uso
-  pessoal), respeitando os termos de uso do MakerWorld.
+- MakerWorld não tem API pública: raspagem pode quebrar se o layout mudar.
+- Camadas gratuitas (Vercel/Supabase) têm limites de uso — improvável de
+  estourar no volume esperado, mas vale monitorar se crescer muito.
+- Autenticação e hospedagem são peças que podem falhar — mais superfície de
+  manutenção que um script local.
+
+## Identidade visual
+
+Marca CMG3D. Logo fornecido pelo usuário — roxo/metálico, tipografia bold
+angular, ilustração de família na composição. Visual do site: vitrine, cor
+de marca forte (não minimalista). Paleta exata e tipografia ainda a
+definir durante a implementação, a partir do logo.
 
 ## Convenções
 
 - Idioma: português do Brasil, em código, commits e documentação.
-- Sem abstração prematura — é uma ferramenta de uso pessoal, não um
-  produto para terceiros.
+- Sem abstração prematura — é uso pessoal/familiar, não produto para
+  terceiros administrarem.
