@@ -2,6 +2,8 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+.pytest_cache/
 data/fotos/
+data/catalogo.csv
 output/
 .env
