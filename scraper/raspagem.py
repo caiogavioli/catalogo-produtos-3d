@@ -7,7 +7,7 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-from .config import CSV_PATH, FOTOS_DIR, MAX_FOTOS_POR_PRODUTO
+from .config import CSV_PATH, FOTOS_DIR, MAX_FOTOS_POR_PRODUTO, RAIZ
 from .csv_utils import gravar_csv
 from .modelos import Produto
 from .navegador import extrair_dados_modelo, listar_colecoes, listar_modelos_da_colecao
@@ -25,7 +25,9 @@ def _baixar_fotos(urls: list[str], destino: Path) -> list[str]:
         except OSError as erro:
             print(f"    aviso: falha ao baixar foto {url}: {erro}")
             continue
-        caminhos.append(str(caminho.relative_to(FOTOS_DIR.parent)))
+        # Caminho relativo à raiz do projeto (ex.: "data/fotos/vasos/vaso/01.jpg"),
+        # para o gerador de PDF abrir a foto rodando a partir da raiz.
+        caminhos.append(str(caminho.relative_to(RAIZ)))
     return caminhos
 
 
