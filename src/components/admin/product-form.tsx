@@ -98,7 +98,12 @@ export function ProductForm({
               <div key={image.id} className="group relative aspect-square">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={image.url} alt="" className="h-full w-full rounded object-cover" />
-                <form action={deleteProductImage.bind(null, image.id)}>
+                <form
+                  action={deleteProductImage.bind(null, image.id)}
+                  onSubmit={(event) => {
+                    if (!confirm("Remover esta foto?")) event.preventDefault();
+                  }}
+                >
                   <button
                     type="submit"
                     title="Remover foto"

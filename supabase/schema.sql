@@ -60,10 +60,20 @@ alter table products enable row level security;
 alter table product_images enable row level security;
 alter table colors enable row level security;
 
+drop policy if exists "leitura pública" on categories;
+drop policy if exists "leitura pública" on products;
+drop policy if exists "leitura pública" on product_images;
+drop policy if exists "leitura pública" on colors;
+
 create policy "leitura pública" on categories for select using (true);
 create policy "leitura pública" on products for select using (true);
 create policy "leitura pública" on product_images for select using (true);
 create policy "leitura pública" on colors for select using (true);
+
+drop policy if exists "escrita autenticada" on categories;
+drop policy if exists "escrita autenticada" on products;
+drop policy if exists "escrita autenticada" on product_images;
+drop policy if exists "escrita autenticada" on colors;
 
 create policy "escrita autenticada" on categories for all
   using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
@@ -74,12 +84,14 @@ create policy "escrita autenticada" on product_images for all
 create policy "escrita autenticada" on colors for all
   using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 
--- Storage: bucket público para fotos de produto. Criar manualmente no painel
--- (Storage -> New bucket -> "produtos", marcar "Public bucket") e então
--- rodar as policies abaixo.
+-- Storage: bucket público para fotos de produto.
 insert into storage.buckets (id, name, public)
 values ('produtos', 'produtos', true)
 on conflict (id) do nothing;
+
+drop policy if exists "leitura pública das fotos" on storage.objects;
+drop policy if exists "upload autenticado de fotos" on storage.objects;
+drop policy if exists "remoção autenticada de fotos" on storage.objects;
 
 create policy "leitura pública das fotos" on storage.objects for select
   using (bucket_id = 'produtos');

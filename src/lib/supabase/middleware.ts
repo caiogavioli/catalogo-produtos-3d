@@ -35,14 +35,24 @@ export async function updateSession(request: NextRequest) {
   if (isAdminRoute && !isLoginRoute && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
-    return NextResponse.redirect(url);
+    return redirectWithSessionCookies(url, response);
   }
 
   if (isLoginRoute && user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
-    return NextResponse.redirect(url);
+    return redirectWithSessionCookies(url, response);
   }
 
   return response;
+}
+
+// Preserva cookies de sessão renovados por getUser() (que ficam em
+// `response`) mesmo quando a resposta final é um redirect novo.
+function redirectWithSessionCookies(url: URL, response: NextResponse) {
+  const redirectResponse = NextResponse.redirect(url);
+  for (const cookie of response.cookies.getAll()) {
+    redirectResponse.cookies.set(cookie);
+  }
+  return redirectResponse;
 }
