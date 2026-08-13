@@ -22,14 +22,18 @@ Entra:
 - Área admin com login para 2 usuários, mesma permissão total (CRUD de
   produtos e categorias).
 - Página de cores disponíveis (lista geral, não é atributo por produto).
-- Raspagem do MakerWorld para popular produtos inicialmente; edição
-  posterior é manual pelo painel admin.
 
 Não entra:
 - Geração de PDF (descontinuada).
 - Checkout/venda dentro do site.
 - Domínio próprio pago — usa domínio gratuito do Vercel.
-- Atualização automática/agendada da raspagem.
+- Raspagem automática do MakerWorld — descartada (decisão de
+  2026-08-13, ver `sessoes/` no repo Brainstorm): o ambiente de
+  implementação não tinha acesso de rede ao MakerWorld pra sequer
+  inspecionar a página, e o usuário preferiu cadastro manual pelo
+  painel admin a depender de um raspador não testado contra site sem
+  API oficial. As pastas `scraper/` e `data/` ficam como estavam
+  (vazias) — se algum dia isso for retomado, é projeto à parte.
 
 ## Stack
 
@@ -37,16 +41,16 @@ Não entra:
 - Hospedagem: Vercel, domínio `*.vercel.app` gratuito.
 - Banco de dados + autenticação + storage de imagens: Supabase (camada
   gratuita).
-- Raspagem: script (Python ou Node) contra o MakerWorld, rodado sob
-  demanda, sem API pública disponível.
 
 ## Riscos conhecidos
 
-- MakerWorld não tem API pública: raspagem pode quebrar se o layout mudar.
 - Camadas gratuitas (Vercel/Supabase) têm limites de uso — improvável de
   estourar no volume esperado, mas vale monitorar se crescer muito.
 - Autenticação e hospedagem são peças que podem falhar — mais superfície de
   manutenção que um script local.
+- Cadastro de produtos é 100% manual pelo painel admin (sem raspagem) —
+  cadastrar muitos produtos de uma vez é trabalho repetitivo; aceito
+  como troca pela simplicidade.
 
 ## Identidade visual
 

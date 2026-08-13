@@ -17,9 +17,9 @@ produtos a clientes. Hoje a única vitrine é um Instagram simples.
 - **Área admin**: login para duas pessoas (mesma permissão), cadastro,
   edição e remoção de produtos e categorias.
 - **Página de cores disponíveis**: lista geral, independente de produto.
-- **Raspagem do MakerWorld** para popular os produtos inicialmente; edição
-  posterior é manual, pelo painel admin.
 - Sem PDF, sem checkout, sem domínio próprio pago — link gratuito do Vercel.
+- Sem raspagem automática do MakerWorld (descartada — ver Status):
+  cadastro de produtos é manual, pelo painel admin.
 
 Spec completa da decisão: ver `projetos/catalogo-produtos-3d.md` no
 repositório [caiogavioli/Brainstorm](https://github.com/caiogavioli/Brainstorm).
@@ -29,7 +29,6 @@ repositório [caiogavioli/Brainstorm](https://github.com/caiogavioli/Brainstorm)
 - **Frontend**: Next.js (App Router, TypeScript, Tailwind CSS)
 - **Hospedagem**: Vercel (domínio gratuito `*.vercel.app`)
 - **Banco de dados + Auth + Storage**: Supabase (grátis no volume esperado)
-- **Raspagem inicial**: script contra o MakerWorld (sem API pública)
 
 ## Estrutura
 
@@ -39,8 +38,7 @@ src/components/      # componentes de UI
 src/lib/supabase/    # clientes Supabase (browser, server, middleware)
 src/types/           # tipos compartilhados do catálogo
 supabase/schema.sql  # schema do banco + políticas de acesso (RLS)
-scraper/             # script de raspagem do MakerWorld -> popula o banco
-data/                # dados intermediários/exportados da raspagem, se necessário
+scraper/, data/      # sem uso — raspagem do MakerWorld foi descartada, ver Status
 assets/logo/         # logo da marca (a adicionar)
 ```
 
@@ -88,7 +86,12 @@ acima no projeto Vercel, e usar o domínio gratuito `*.vercel.app`.
 
 ## Status
 
-Em construção. Esqueleto do site (catálogo público + área admin) implementado
-com Next.js + Supabase — falta: criar o projeto Supabase real, adicionar o
-logo da marca, popular os produtos (raspagem do MakerWorld ainda não escrita)
-e fazer o deploy no Vercel.
+Site (catálogo público + área admin) implementado com Next.js + Supabase e
+publicado no Vercel. Falta: confirmar que o schema e as contas admin foram
+criados no projeto Supabase real, configurar as variáveis de ambiente no
+Vercel, adicionar o logo da marca e cadastrar os produtos pelo painel admin.
+
+A raspagem automática do MakerWorld, que estava no escopo original, foi
+**descartada**: o ambiente de implementação não tinha acesso de rede ao
+MakerWorld para sequer inspecionar a página, e o usuário preferiu cadastro
+manual a um raspador não testado contra um site sem API oficial.
