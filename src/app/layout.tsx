@@ -30,7 +30,12 @@ export default function RootLayout({
         </header>
         <main className="flex-1">{children}</main>
         <footer className="bg-metal-900 text-metal-300 text-sm">
-          <div className="mx-auto max-w-5xl px-4 py-6">CMG3D</div>
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-6">
+            <span>CMG3D</span>
+            <Link href="/admin" className="text-metal-500 hover:text-metal-300">
+              Área admin
+            </Link>
+          </div>
         </footer>
       </body>
     </html>
