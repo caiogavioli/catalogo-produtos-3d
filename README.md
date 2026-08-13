@@ -32,13 +32,44 @@ output/      # PDFs gerados (por categoria + completo)
 
 ## Como rodar
 
-_A documentar conforme os scripts forem implementados._
+### Raspagem (MakerWorld -> `data/catalogo.csv`)
 
-1. Rodar a raspagem: popula/atualiza `data/catalogo.csv` e `data/fotos/`.
-2. Revisar `data/catalogo.csv` — remover produtos que não quer manter.
-3. Rodar a geração de PDF: gera os arquivos em `output/`.
+O MakerWorld não tem "pastas" nativas na conta do usuário — a organização
+mais próxima disso são as **Collections** públicas do perfil, que o
+scraper trata como categoria de cada produto.
+
+1. Instalar dependências (recomendado usar um virtualenv):
+   ```
+   pip install -r requirements.txt
+   python -m playwright install chromium
+   ```
+2. Rodar a raspagem, usando o handle da conta (o que aparece depois do
+   `@` na URL do perfil, ex.: `makerworld.com/en/@meuusuario`):
+   ```
+   python -m scraper --usuario meuusuario
+   ```
+   Isso popula/sobrescreve `data/catalogo.csv` e baixa as fotos em
+   `data/fotos/<categoria>/<produto>/`.
+
+   Flags úteis:
+   - `--visivel`: abre o navegador em modo visível, para depurar caso o
+     site tenha mudado de layout (ver "Riscos conhecidos" no
+     `CLAUDE.md`).
+   - `--limite-colecoes N`: raspa só as N primeiras coleções, para testar
+     rápido antes de rodar tudo.
+3. Revisar `data/catalogo.csv` — a raspagem é best-effort (em especial o
+   campo `tamanho` e as fotos extras além da capa), então vale conferir
+   antes de gerar o PDF, e remover produtos que não quer manter.
+4. Rodar a geração de PDF: gera os arquivos em `output/`.
+
+### Testes
+
+```
+pip install -r requirements-dev.txt
+pytest
+```
 
 ## Status
 
-Em construção — esqueleto inicial criado a partir da spec fechada em
-`caiogavioli/Brainstorm`.
+Scraper do MakerWorld implementado (`scraper/`). Geração de PDF ainda não
+implementada (`pdf/`).
