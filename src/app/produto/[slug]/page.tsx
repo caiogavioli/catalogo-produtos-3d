@@ -1,0 +1,76 @@
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { formatPrice } from "@/lib/format";
+import type { Product } from "@/types/catalog";
+
+export default async function ProdutoPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const supabase = await createClient();
+
+  const { data: product } = await supabase
+    .from("products")
+    .select(
+      "id, name, slug, description, size, price, category_id, created_at, category:categories(id, name, slug), images:product_images(id, product_id, url, position)",
+    )
+    .eq("slug", slug)
+    .single();
+
+  if (!product) notFound();
+
+  const typedProduct = product as unknown as Product;
+  const images = [...(typedProduct.images ?? [])].sort((a, b) => a.position - b.position);
+
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-10">
+      <div className="grid gap-8 md:grid-cols-2">
+        <div className="space-y-3">
+          <div className="relative aspect-square overflow-hidden rounded-lg bg-metal-100">
+            {images[0] ? (
+              <Image src={images[0].url} alt={typedProduct.name} fill sizes="50vw" className="object-cover" />
+            ) : (
+              <div className="flex h-full items-center justify-center text-metal-500">Sem foto</div>
+            )}
+          </div>
+          {images.length > 1 && (
+            <div className="grid grid-cols-4 gap-2">
+              {images.slice(1).map((image) => (
+                <div key={image.id} className="relative aspect-square overflow-hidden rounded bg-metal-100">
+                  <Image src={image.url} alt={typedProduct.name} fill sizes="12vw" className="object-cover" />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div>
+          {typedProduct.category && (
+            <Link
+              href={`/categoria/${typedProduct.category.slug}`}
+              className="text-sm font-medium text-brand-700 hover:underline"
+            >
+              {typedProduct.category.name}
+            </Link>
+          )}
+          <h1 className="mt-1 text-2xl font-bold text-metal-900">{typedProduct.name}</h1>
+          <p className="mt-2 text-xl text-brand-700">{formatPrice(typedProduct.price)}</p>
+
+          {typedProduct.size && (
+            <p className="mt-4 text-sm text-metal-700">
+              <span className="font-semibold">Tamanho:</span> {typedProduct.size}
+            </p>
+          )}
+
+          {typedProduct.description && (
+            <p className="mt-4 whitespace-pre-line text-metal-700">{typedProduct.description}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

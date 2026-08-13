@@ -26,7 +26,7 @@ repositório [caiogavioli/Brainstorm](https://github.com/caiogavioli/Brainstorm)
 
 ## Stack
 
-- **Frontend**: Next.js
+- **Frontend**: Next.js (App Router, TypeScript, Tailwind CSS)
 - **Hospedagem**: Vercel (domínio gratuito `*.vercel.app`)
 - **Banco de dados + Auth + Storage**: Supabase (grátis no volume esperado)
 - **Raspagem inicial**: script contra o MakerWorld (sem API pública)
@@ -34,21 +34,61 @@ repositório [caiogavioli/Brainstorm](https://github.com/caiogavioli/Brainstorm)
 ## Estrutura
 
 ```
-scraper/     # script de raspagem do MakerWorld -> popula o banco (Supabase)
-data/        # dados intermediários/exportados da raspagem, se necessário
-app/         # aplicação Next.js (catálogo público + painel admin) — a criar
+src/app/            # rotas Next.js (catálogo público + /admin)
+src/components/      # componentes de UI
+src/lib/supabase/    # clientes Supabase (browser, server, middleware)
+src/types/           # tipos compartilhados do catálogo
+supabase/schema.sql  # schema do banco + políticas de acesso (RLS)
+scraper/             # script de raspagem do MakerWorld -> popula o banco
+data/                # dados intermediários/exportados da raspagem, se necessário
+assets/logo/         # logo da marca (a adicionar)
 ```
 
 ## Identidade visual
 
 Marca: **CMG3D**. Logo em roxo/metálico, estilo moderno — ver arquivo em
 `assets/logo/` (a adicionar). Visual do site: vitrine, cor de marca forte.
+A paleta em `src/app/globals.css` é um placeholder roxo/metálico até o
+arquivo do logo chegar.
 
 ## Como rodar
 
-_A documentar conforme a aplicação for implementada._
+### 1. Criar o projeto no Supabase
+
+1. Criar um projeto novo (grátis) em [supabase.com](https://supabase.com).
+2. No **SQL Editor**, rodar o conteúdo de `supabase/schema.sql` — cria as
+   tabelas, as políticas de acesso e o bucket de storage `produtos`.
+3. Em **Authentication → Users**, criar manualmente as duas contas admin
+   (e-mail + senha). Não há tela de cadastro pública — só o painel do
+   Supabase cria usuários.
+4. Em **Project Settings → API**, copiar a `Project URL` e a chave
+   `anon public`.
+
+### 2. Configurar variáveis de ambiente
+
+```bash
+cp .env.example .env.local
+# preencher NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY
+```
+
+### 3. Rodar localmente
+
+```bash
+npm install
+npm run dev
+```
+
+- Catálogo público: `http://localhost:3000`
+- Painel admin: `http://localhost:3000/admin` (pede login)
+
+### 4. Deploy
+
+Importar o repositório no Vercel, configurar as duas variáveis de ambiente
+acima no projeto Vercel, e usar o domínio gratuito `*.vercel.app`.
 
 ## Status
 
-Em construção — esqueleto inicial criado a partir da spec revisada (v2) em
-`caiogavioli/Brainstorm`.
+Em construção. Esqueleto do site (catálogo público + área admin) implementado
+com Next.js + Supabase — falta: criar o projeto Supabase real, adicionar o
+logo da marca, popular os produtos (raspagem do MakerWorld ainda não escrita)
+e fazer o deploy no Vercel.

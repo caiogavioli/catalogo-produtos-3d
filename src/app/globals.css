@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/*
+ * Paleta placeholder (roxo/metálico). Ajustar quando o arquivo do logo
+ * for adicionado em assets/logo/ — ver CLAUDE.md, seção Identidade visual.
+ */
+@theme {
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-200: #ddd6fe;
+  --color-brand-300: #c4b5fd;
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+  --color-brand-800: #5b21b6;
+  --color-brand-900: #4c1d95;
+
+  --color-metal-100: #f1f2f4;
+  --color-metal-300: #cdd0d6;
+  --color-metal-500: #8c919c;
+  --color-metal-700: #4a4e57;
+  --color-metal-900: #1f2126;
+}
+
+body {
+  background-color: var(--color-metal-100);
+  color: var(--color-metal-900);
+}
