@@ -87,15 +87,34 @@ Editor do Supabase — não temos acesso automatizado ao banco de produção.
 
 Marca CMG3D. Logo fornecido pelo usuário — roxo/metálico, tipografia bold
 angular, ilustração de família na composição (ainda não salvo como
-arquivo no repo). Visual do site (redefinido em 2026-08-14, a pedido do
-usuário): tema **escuro** ("cinza chumbo"), acento **roxo metálico** (cor
-da marca — testado brevemente com cobre/laranja, revertido no mesmo dia
-a pedido do usuário), cartões com leve efeito vidro (glass, `bg-ink-900`
-translúcido + blur), fonte Inter, ícones Lucide, pequenas animações de
+arquivo no repo).
+
+Visual do site — v3, redefinido em 2026-08-14 depois de uma pesquisa de
+mercado em catálogos/marketplaces de impressão 3D (MakerWorld, Printables,
+Bambu Store), que apontou o visual anterior (roxo sobre preto + cards de
+vidro) como o clichê genérico de SaaS, não o padrão do nicho. Decisão do
+usuário foi misturar as duas direções propostas:
+
+- Tema **escuro carvão neutro** (sem o glow roxo de fundo da versão
+  anterior), sem glassmorphism — cartões viram superfície sólida
+  (`.glass-card` continua com esse nome por história, mas hoje é só
+  `bg-ink-900` + borda, sem blur).
+- **Âmbar** (`accent-*`, cor de filamento fundido) é o acento funcional
+  principal: preço, botões de ação, badge "Novo", links.
+- **Ciano** (`teal-*`) marca estado ativo/selecionado: foco de teclado,
+  cor de produto selecionada, checkbox/radio marcado, aba ativa de
+  ordenação.
+- **Roxo metálico** (`brand-*`, a cor real da marca) fica reservado só
+  pra identidade — ícone do logo no cabeçalho, selo "Destaque" e
+  indicador ativo do carrossel da home. Não deve virar acento de botão
+  ou de link comum de novo; é o que evita competir com os acentos
+  funcionais em todo o resto do site.
+- Preço em fonte monoespaçada (`font-mono`), lendo como dado técnico.
+
+Fonte Inter (corpo/UI), ícones Lucide, pequenas animações de
 entrada/hover com Framer Motion, menu de categorias no cabeçalho. Tokens
-de cor em `src/app/globals.css` (`ink-*` = superfícies/texto em cinza
-chumbo, `brand-*` = acento roxo). Ajustar quando o logo real virar
-arquivo — pode influenciar o tom exato do roxo.
+de cor em `src/app/globals.css`. Ajustar quando o logo real virar
+arquivo — pode influenciar o tom exato do roxo reservado.
 
 ## Convenções
 
