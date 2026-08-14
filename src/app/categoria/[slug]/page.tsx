@@ -46,7 +46,7 @@ export default async function CategoriaPage({
   const { data: products, count } = await supabase
     .from("products")
     .select(
-      "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex))",
+      "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))",
       { count: "exact" },
     )
     .eq("category_id", category.id)

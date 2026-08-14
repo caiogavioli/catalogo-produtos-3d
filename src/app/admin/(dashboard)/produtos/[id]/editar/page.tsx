@@ -17,12 +17,12 @@ export default async function EditarProdutoPage({
     supabase
       .from("products")
       .select(
-        "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex))",
+        "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))",
       )
       .eq("id", id)
       .single(),
     supabase.from("categories").select("id, name, slug").order("name"),
-    supabase.from("colors").select("id, name, hex").order("name"),
+    supabase.from("colors").select("id, name, hex, metallic").order("name"),
   ]);
 
   if (!product) notFound();

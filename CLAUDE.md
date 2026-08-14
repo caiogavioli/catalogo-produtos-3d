@@ -28,6 +28,9 @@ Entra:
   `color_mode`: "única" (não mostra nada) ou "várias" (mostra círculos
   das cores escolhidas pra ele, na página do produto e na visualização
   rápida). A cor escolhida pelo cliente entra na mensagem do WhatsApp.
+  Cor pode ser marcada como "metálica" no admin — o círculo ganha um
+  brilho (gradiente claro/escuro sobre a cor base, `colorSwatchStyle`
+  em `src/lib/colors.ts`) em vez de ficar lisa.
 - Busca por nome de produto (`/busca`), com paginação.
 - Página de categoria com ordenação (recentes/preço) e paginação —
   necessário desde que o usuário avisou que o catálogo vai crescer pra

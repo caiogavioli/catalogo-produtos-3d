@@ -236,9 +236,10 @@ export async function createColor(_prevState: ActionState, formData: FormData): 
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return { error: "Nome é obrigatório." };
   const hex = String(formData.get("hex") ?? "").trim() || null;
+  const metallic = formData.get("metallic") === "on";
 
   const supabase = await createClient();
-  const { error } = await supabase.from("colors").insert({ name, hex });
+  const { error } = await supabase.from("colors").insert({ name, hex, metallic });
   if (error) return { error: error.message };
 
   revalidatePath("/admin/cores");

@@ -35,7 +35,8 @@ create table if not exists product_images (
 create table if not exists colors (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  hex text
+  hex text,
+  metallic boolean not null default false
 );
 
 -- Só usada quando products.color_mode = 'varias' — quais cores (dentre

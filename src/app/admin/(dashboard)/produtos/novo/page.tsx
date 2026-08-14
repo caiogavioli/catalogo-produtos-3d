@@ -7,7 +7,7 @@ export default async function NovoProdutoPage() {
   const supabase = await createClient();
   const [{ data: categories }, { data: colors }] = await Promise.all([
     supabase.from("categories").select("id, name, slug").order("name"),
-    supabase.from("colors").select("id, name, hex").order("name"),
+    supabase.from("colors").select("id, name, hex, metallic").order("name"),
   ]);
 
   return (

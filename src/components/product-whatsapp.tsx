@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { whatsappLink } from "@/lib/whatsapp";
+import { colorSwatchStyle } from "@/lib/colors";
 import type { Color } from "@/types/catalog";
 
 // Mostra os círculos de cor (só quando o produto tem "várias cores") e o
@@ -38,7 +39,7 @@ export function ProductWhatsapp({
                 className={`h-8 w-8 rounded-full ring-2 transition-shadow ${
                   selectedColor?.id === color.id ? "ring-brand-500" : "ring-ink-800 hover:ring-ink-200"
                 }`}
-                style={{ backgroundColor: color.hex ?? "#ffffff" }}
+                style={colorSwatchStyle(color)}
               />
             ))}
           </div>

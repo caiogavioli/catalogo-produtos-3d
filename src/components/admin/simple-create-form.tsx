@@ -26,12 +26,18 @@ export function SimpleCreateForm({
         />
       </div>
       {withHex && (
-        <div>
-          <label htmlFor="hex" className="block text-sm font-medium text-ink-200">
-            Cor (opcional)
+        <>
+          <div>
+            <label htmlFor="hex" className="block text-sm font-medium text-ink-200">
+              Cor (opcional)
+            </label>
+            <input id="hex" name="hex" type="color" className="mt-1 h-10 w-16 rounded border border-ink-800" />
+          </div>
+          <label className="flex items-center gap-2 pb-2 text-sm text-ink-200">
+            <input type="checkbox" name="metallic" className="h-4 w-4 rounded border-ink-800 bg-ink-900 accent-brand-700" />
+            Metálica
           </label>
-          <input id="hex" name="hex" type="color" className="mt-1 h-10 w-16 rounded border border-ink-800" />
-        </div>
+        </>
       )}
       <button
         type="submit"

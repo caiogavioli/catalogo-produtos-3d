@@ -12,7 +12,7 @@ export default async function HomePage() {
     supabase.from("categories").select("id, name, slug").order("name"),
     supabase
       .from("products")
-      .select("id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex))")
+      .select("id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))")
       .order("created_at", { ascending: false }),
   ]);
 

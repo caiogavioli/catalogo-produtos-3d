@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { deleteProductImage, type ActionState } from "@/app/admin/actions";
+import { colorSwatchStyle } from "@/lib/colors";
 import type { Category, Color, Product } from "@/types/catalog";
 
 export function ProductForm({
@@ -145,10 +146,7 @@ export function ProductForm({
                       defaultChecked={selectedColorIds.has(color.id)}
                       className="accent-brand-700"
                     />
-                    <span
-                      className="h-4 w-4 rounded-full ring-1 ring-ink-800"
-                      style={{ backgroundColor: color.hex ?? "#ffffff" }}
-                    />
+                    <span className="h-4 w-4 rounded-full ring-1 ring-ink-800" style={colorSwatchStyle(color)} />
                     {color.name}
                   </label>
                 ))}

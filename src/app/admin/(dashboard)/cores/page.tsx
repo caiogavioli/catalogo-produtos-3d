@@ -2,11 +2,12 @@ import { createClient } from "@/lib/supabase/server";
 import { createColor, deleteColor } from "../../actions";
 import { SimpleCreateForm } from "@/components/admin/simple-create-form";
 import { DeleteButton } from "@/components/admin/delete-button";
+import { colorSwatchStyle } from "@/lib/colors";
 import type { Color } from "@/types/catalog";
 
 export default async function AdminCoresPage() {
   const supabase = await createClient();
-  const { data: colors } = await supabase.from("colors").select("id, name, hex").order("name");
+  const { data: colors } = await supabase.from("colors").select("id, name, hex, metallic").order("name");
   const items = (colors ?? []) as Color[];
 
   return (
@@ -22,11 +23,9 @@ export default async function AdminCoresPage() {
           {items.map((color) => (
             <li key={color.id} className="flex items-center justify-between py-2">
               <span className="flex items-center gap-2 text-ink-50">
-                <span
-                  className="h-5 w-5 rounded-full ring-1 ring-ink-800"
-                  style={{ backgroundColor: color.hex ?? "#ffffff" }}
-                />
+                <span className="h-5 w-5 rounded-full ring-1 ring-ink-800" style={colorSwatchStyle(color)} />
                 {color.name}
+                {color.metallic && <span className="text-xs text-ink-400">(metálica)</span>}
               </span>
               <DeleteButton action={deleteColor.bind(null, color.id)} />
             </li>
