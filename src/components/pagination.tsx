@@ -14,7 +14,7 @@ export function Pagination({
   return (
     <nav className="mt-8 flex items-center justify-center gap-4 text-sm">
       {page > 1 ? (
-        <Link href={buildHref(page - 1)} className="text-accent-500 hover:underline">
+        <Link href={buildHref(page - 1)} className="text-brand-500 hover:underline">
           ← Anterior
         </Link>
       ) : (
@@ -24,7 +24,7 @@ export function Pagination({
         Página {page} de {totalPages}
       </span>
       {page < totalPages ? (
-        <Link href={buildHref(page + 1)} className="text-accent-500 hover:underline">
+        <Link href={buildHref(page + 1)} className="text-brand-500 hover:underline">
           Próxima →
         </Link>
       ) : (

@@ -18,7 +18,7 @@ export default async function AdminProdutosPage() {
     <div className="mx-auto max-w-5xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-ink-50">Produtos</h1>
-        <Link href="/admin/produtos/novo" className="rounded bg-accent-700 px-4 py-2 text-white hover:bg-accent-800">
+        <Link href="/admin/produtos/novo" className="rounded bg-brand-700 px-4 py-2 text-white hover:bg-brand-800">
           Novo produto
         </Link>
       </div>
@@ -43,7 +43,7 @@ export default async function AdminProdutosPage() {
                 <td className="py-2 text-ink-400">{formatPrice(product.price)}</td>
                 <td className="py-2 text-right">
                   <div className="flex justify-end gap-3">
-                    <Link href={`/admin/produtos/${product.id}/editar`} className="text-accent-500 hover:underline">
+                    <Link href={`/admin/produtos/${product.id}/editar`} className="text-brand-500 hover:underline">
                       Editar
                     </Link>
                     <DeleteButton action={deleteProduct.bind(null, product.id)} />

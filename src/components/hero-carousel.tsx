@@ -62,10 +62,10 @@ export function HeroCarousel({ products }: { products: Product[] }) {
           <div className="absolute bottom-0 left-0 p-5 sm:p-8">
             <span className="text-xs font-medium uppercase tracking-wide text-brand-200">Destaque</span>
             <h2 className="mt-1 text-xl font-bold text-ink-50 sm:text-3xl">{product.name}</h2>
-            <p className="mt-1 font-mono text-accent-200 sm:text-lg">{formatPrice(product.price)}</p>
+            <p className="mt-1 font-mono text-brand-200 sm:text-lg">{formatPrice(product.price)}</p>
             <Link
               href={`/produto/${product.slug}`}
-              className="mt-3 inline-block rounded bg-accent-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-800"
+              className="mt-3 inline-block rounded bg-brand-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-800"
             >
               Ver produto
             </Link>

@@ -19,7 +19,7 @@ function SearchForm({ onSubmitted, className }: { onSubmitted?: () => void; clas
           type="search"
           name="q"
           placeholder="Buscar produto..."
-          className="w-full rounded-full border border-ink-800 bg-ink-900 py-1.5 pl-8 pr-3 text-sm text-ink-50 placeholder:text-ink-400 focus:outline-none focus:ring-1 focus:ring-teal-400"
+          className="w-full rounded-full border border-ink-800 bg-ink-900 py-1.5 pl-8 pr-3 text-sm text-ink-50 placeholder:text-ink-400 focus:outline-none focus:ring-1 focus:ring-brand-300"
         />
       </div>
     </form>
@@ -45,7 +45,7 @@ function CategoriasMenu({ categories }: { categories: Category[] }) {
       <button
         type="button"
         onClick={() => setAberto((open) => !open)}
-        className="flex items-center gap-1 transition-colors hover:text-accent-200"
+        className="flex items-center gap-1 transition-colors hover:text-brand-200"
         aria-expanded={aberto}
         aria-controls="categorias-menu-painel"
       >
@@ -67,7 +67,7 @@ function CategoriasMenu({ categories }: { categories: Category[] }) {
                 key={category.id}
                 href={`/categoria/${category.slug}`}
                 onClick={() => setAberto(false)}
-                className="block rounded px-3 py-2 text-ink-200 transition-colors hover:bg-ink-800 hover:text-accent-200"
+                className="block rounded px-3 py-2 text-ink-200 transition-colors hover:bg-ink-800 hover:text-brand-200"
               >
                 {category.name}
               </Link>
@@ -97,7 +97,7 @@ export function SiteHeader({ categories }: { categories: Category[] }) {
 
         {/* Desktop */}
         <nav className="hidden items-center gap-6 text-sm text-ink-200 md:flex">
-          <Link href="/" className="transition-colors hover:text-accent-200">
+          <Link href="/" className="transition-colors hover:text-brand-200">
             Catálogo
           </Link>
           <CategoriasMenu categories={categories} />

@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 /*
- * Paleta CMG3D v2 (2026-08-14): fundo carvão neutro do nicho de impressão
- * 3D, com dois acentos funcionais e um acento de marca reservado.
+ * Paleta CMG3D v4 (2026-08-14): tudo ancorado no roxo metálico da marca,
+ * com um cinza metálico como segunda voz (não um segundo acento colorido).
  *
- *   - `accent` (âmbar, cor de filamento fundido): CTA, preço, badges — o
- *     acento principal, usado em quase tudo que antes era roxo.
- *   - `teal` (ciano, "impressora ligada"): estado ativo/selecionado —
- *     foco, seleção de cor, item marcado.
- *   - `brand` (roxo metálico, cor real da marca/logo): reservado só pros
- *     locais de identidade — logo no cabeçalho, selo "Destaque" e o
- *     indicador ativo do carrossel — pra não competir com os acentos
- *     funcionais em todo o resto do site.
+ *   - `brand` (roxo metálico): a cor da marca faz o trabalho de acento em
+ *     quase tudo — CTA, preço, badges, links, foco, seleção. `brand-300`
+ *     é o tom mais claro, usado em foco/seleção pra diferenciar de
+ *     `brand-700` (preenchimento sólido de botão) sem sair da família.
+ *   - `steel` (cinza metálico): segunda voz, não um acento novo — texto
+ *     técnico (ficha técnica, specs) e realces discretos.
+ *   - `ink`: superfícies e texto, com uma leve nuance violeta-acinzentada
+ *     em vez de cinza puro, pra combinar com o roxo em vez de competir.
  *
  * Convenção: quanto MAIOR o número, mais escuro (padrão Tailwind). Em
  * `ink`, 950 é a superfície mais escura (fundo) e 50 é quase branco
@@ -22,38 +22,37 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  /* âmbar — acento principal (CTA, preço, badges) */
-  --color-accent-200: #ffd9b3;
-  --color-accent-500: #ff8a3d;
-  --color-accent-700: #e2620f;
-  --color-accent-800: #b34c00;
+  /* roxo metálico — acento único, do site inteiro */
+  --color-brand-300: #c4b5fd; /* foco, seleção, indicador ativo */
+  --color-brand-500: #a78bfa; /* texto/links/ícones sobre fundo escuro */
+  --color-brand-700: #7c3aed; /* preenchimento sólido de botão/badge */
+  --color-brand-800: #6d28d9; /* hover do preenchimento sólido */
+  --color-brand-900: #5b21b6; /* estado ativo mais forte (ex.: aba selecionada) */
 
-  /* ciano — estado ativo/selecionado */
-  --color-teal-400: #3fd8e6;
-  --color-teal-600: #0f9aa8;
+  /* cinza metálico — segunda voz, não concorre com o roxo */
+  --color-steel-300: #b7bac4;
+  --color-steel-400: #9298a6;
+  --color-steel-600: #656b7a;
 
-  /* roxo metálico — reservado pra identidade de marca (logo, destaque) */
-  --color-brand-200: #ddd6fe;
-  --color-brand-500: #a78bfa;
-  --color-brand-700: #7c3aed;
-  --color-brand-800: #6d28d9;
-
-  /* superfícies e texto — carvão neutro */
-  --color-ink-50: #f2f1ee;
-  --color-ink-200: #c7c8cb;
-  --color-ink-400: #8c8f93;
-  --color-ink-800: #2a2b2e;
-  --color-ink-900: #18191b;
-  --color-ink-950: #111213;
+  /* superfícies e texto — nuance violeta-acinzentada, não cinza puro */
+  --color-ink-50: #f4f3f7;
+  --color-ink-200: #cac7d3;
+  --color-ink-400: #928fa0;
+  --color-ink-800: #2e2b38;
+  --color-ink-900: #1c1a24;
+  --color-ink-950: #121016;
 }
 
 body {
   background-color: var(--color-ink-950);
+  background-image: radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--color-brand-700) 14%, transparent), transparent);
   color: var(--color-ink-50);
 }
 
-/* cartão de superfície: usado no catálogo e no admin */
+/* cartão de superfície: leve sugestão de metal escovado (gradiente sutil
+   em vez de chapado), sem o blur de vidro genérico da versão anterior */
 .glass-card {
   background-color: var(--color-ink-900);
+  background-image: linear-gradient(155deg, color-mix(in srgb, var(--color-steel-400) 6%, transparent), transparent 60%);
   border: 1px solid var(--color-ink-800);
 }
