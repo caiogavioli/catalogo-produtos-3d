@@ -72,7 +72,7 @@ export default async function HomePage() {
           <section key={category.id}>
             <div className="mb-4 flex items-baseline justify-between">
               <h2 className="text-xl font-bold text-ink-50">{category.name}</h2>
-              <Link href={`/categoria/${category.slug}`} className="text-sm text-brand-500 hover:underline">
+              <Link href={`/categoria/${category.slug}`} className="text-sm text-accent-500 hover:underline">
                 ver tudo
               </Link>
             </div>

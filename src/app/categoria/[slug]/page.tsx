@@ -87,7 +87,7 @@ export default async function CategoriaPage({
                 key={key}
                 href={buildHref({ sort: key, page: 1 })}
                 className={`rounded-full px-3 py-1 transition-colors ${
-                  key === sortKey ? "bg-brand-700 text-white" : "text-ink-400 hover:bg-ink-800 hover:text-ink-50"
+                  key === sortKey ? "bg-teal-600 text-white" : "text-ink-400 hover:bg-ink-800 hover:text-ink-50"
                 }`}
               >
                 {SORTS[key].label}

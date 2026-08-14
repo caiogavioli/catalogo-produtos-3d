@@ -107,7 +107,7 @@ export function ProductForm({
               value="unica"
               checked={colorMode === "unica"}
               onChange={() => setColorMode("unica")}
-              className="accent-brand-700"
+              className="accent-teal-600"
             />
             Cor única
           </label>
@@ -118,7 +118,7 @@ export function ProductForm({
               value="varias"
               checked={colorMode === "varias"}
               onChange={() => setColorMode("varias")}
-              className="accent-brand-700"
+              className="accent-teal-600"
             />
             Várias cores
           </label>
@@ -129,7 +129,7 @@ export function ProductForm({
             {colors.length === 0 ? (
               <p className="text-sm text-ink-400">
                 Nenhuma cor cadastrada ainda — cadastre em{" "}
-                <a href="/admin/cores" className="text-brand-500 hover:underline">
+                <a href="/admin/cores" className="text-accent-500 hover:underline">
                   Cores
                 </a>
                 .
@@ -146,7 +146,7 @@ export function ProductForm({
                       name="color_ids"
                       value={color.id}
                       defaultChecked={selectedColorIds.has(color.id)}
-                      className="accent-brand-700"
+                      className="accent-teal-600"
                     />
                     <span className="h-4 w-4 rounded-full ring-1 ring-ink-800" style={colorSwatchStyle(color)} />
                     {color.name}
@@ -163,7 +163,7 @@ export function ProductForm({
           type="checkbox"
           name="featured"
           defaultChecked={product?.featured ?? false}
-          className="h-4 w-4 rounded border-ink-800 bg-ink-900 accent-brand-700"
+          className="h-4 w-4 rounded border-ink-800 bg-ink-900 accent-teal-600"
         />
         Destacar na home (banner do topo)
       </label>
@@ -223,7 +223,7 @@ export function ProductForm({
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-brand-700 px-4 py-2 font-medium text-white hover:bg-brand-800 disabled:opacity-60"
+        className="rounded bg-accent-700 px-4 py-2 font-medium text-white hover:bg-accent-800 disabled:opacity-60"
       >
         {pending ? "Salvando..." : "Salvar"}
       </button>

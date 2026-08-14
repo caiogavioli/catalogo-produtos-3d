@@ -27,7 +27,7 @@ export function EditColorRow({ color, deleteAction }: { color: Color; deleteActi
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="text-sm text-brand-500 hover:underline"
+            className="text-sm text-accent-500 hover:underline"
           >
             Editar
           </button>
@@ -69,14 +69,14 @@ export function EditColorRow({ color, deleteAction }: { color: Color; deleteActi
             type="checkbox"
             name="metallic"
             defaultChecked={color.metallic}
-            className="h-4 w-4 rounded border-ink-800 bg-ink-900 accent-brand-700"
+            className="h-4 w-4 rounded border-ink-800 bg-ink-900 accent-teal-600"
           />
           Metálica
         </label>
         <button
           type="submit"
           disabled={pending}
-          className="rounded bg-brand-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-800 disabled:opacity-60"
+          className="rounded bg-accent-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-accent-800 disabled:opacity-60"
         >
           {pending ? "Salvando..." : "Salvar"}
         </button>

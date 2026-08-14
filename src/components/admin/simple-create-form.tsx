@@ -34,7 +34,7 @@ export function SimpleCreateForm({
             <input id="hex" name="hex" type="color" className="mt-1 h-10 w-16 rounded border border-ink-800" />
           </div>
           <label className="flex items-center gap-2 pb-2 text-sm text-ink-200">
-            <input type="checkbox" name="metallic" className="h-4 w-4 rounded border-ink-800 bg-ink-900 accent-brand-700" />
+            <input type="checkbox" name="metallic" className="h-4 w-4 rounded border-ink-800 bg-ink-900 accent-teal-600" />
             Metálica
           </label>
         </>
@@ -42,7 +42,7 @@ export function SimpleCreateForm({
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-brand-700 px-4 py-2 font-medium text-white hover:bg-brand-800 disabled:opacity-60"
+        className="rounded bg-accent-700 px-4 py-2 font-medium text-white hover:bg-accent-800 disabled:opacity-60"
       >
         {pending ? "Adicionando..." : "Adicionar"}
       </button>

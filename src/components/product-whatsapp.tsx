@@ -37,8 +37,8 @@ export function ProductWhatsapp({
                 aria-label={color.name}
                 role="radio"
                 aria-checked={selectedColor?.id === color.id}
-                className={`h-8 w-8 rounded-full ring-2 transition-shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200 ${
-                  selectedColor?.id === color.id ? "ring-brand-500" : "ring-ink-800 hover:ring-ink-200"
+                className={`h-8 w-8 rounded-full ring-2 transition-shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400 ${
+                  selectedColor?.id === color.id ? "ring-teal-400" : "ring-ink-800 hover:ring-ink-200"
                 }`}
                 style={colorSwatchStyle(color)}
               />

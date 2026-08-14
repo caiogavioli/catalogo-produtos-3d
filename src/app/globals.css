@@ -1,9 +1,17 @@
 @import "tailwindcss";
 
 /*
- * Paleta CMG3D: tema escuro "chumbo", acento roxo metálico (cor da marca).
- * Trocar quando o arquivo do logo for adicionado em assets/logo/ — ver
- * CLAUDE.md, seção Identidade visual.
+ * Paleta CMG3D v2 (2026-08-14): fundo carvão neutro do nicho de impressão
+ * 3D, com dois acentos funcionais e um acento de marca reservado.
+ *
+ *   - `accent` (âmbar, cor de filamento fundido): CTA, preço, badges — o
+ *     acento principal, usado em quase tudo que antes era roxo.
+ *   - `teal` (ciano, "impressora ligada"): estado ativo/selecionado —
+ *     foco, seleção de cor, item marcado.
+ *   - `brand` (roxo metálico, cor real da marca/logo): reservado só pros
+ *     locais de identidade — logo no cabeçalho, selo "Destaque" e o
+ *     indicador ativo do carrossel — pra não competir com os acentos
+ *     funcionais em todo o resto do site.
  *
  * Convenção: quanto MAIOR o número, mais escuro (padrão Tailwind). Em
  * `ink`, 950 é a superfície mais escura (fundo) e 50 é quase branco
@@ -12,31 +20,40 @@
  */
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  /* acento roxo metálico */
-  --color-brand-200: #ddd6fe; /* realce claro (hover em texto sobre fundo escuro) */
-  --color-brand-500: #a78bfa; /* texto/links/ícones de destaque sobre fundo escuro */
-  --color-brand-700: #7c3aed; /* fundo sólido de botão (par com texto branco) */
-  --color-brand-800: #6d28d9; /* hover do botão sólido */
+  /* âmbar — acento principal (CTA, preço, badges) */
+  --color-accent-200: #ffd9b3;
+  --color-accent-500: #ff8a3d;
+  --color-accent-700: #e2620f;
+  --color-accent-800: #b34c00;
 
-  /* superfícies e texto — cinza chumbo */
-  --color-ink-50: #f4f5f6; /* texto principal (quase branco) */
-  --color-ink-200: #cdd0d5; /* texto secundário */
-  --color-ink-400: #9a9fa8; /* texto apagado / placeholder */
-  --color-ink-800: #2b2e34; /* bordas, divisores */
-  --color-ink-900: #1a1c20; /* superfície de cartão (usada com transparência) */
-  --color-ink-950: #101114; /* fundo da página */
+  /* ciano — estado ativo/selecionado */
+  --color-teal-400: #3fd8e6;
+  --color-teal-600: #0f9aa8;
+
+  /* roxo metálico — reservado pra identidade de marca (logo, destaque) */
+  --color-brand-200: #ddd6fe;
+  --color-brand-500: #a78bfa;
+  --color-brand-700: #7c3aed;
+  --color-brand-800: #6d28d9;
+
+  /* superfícies e texto — carvão neutro */
+  --color-ink-50: #f2f1ee;
+  --color-ink-200: #c7c8cb;
+  --color-ink-400: #8c8f93;
+  --color-ink-800: #2a2b2e;
+  --color-ink-900: #18191b;
+  --color-ink-950: #111213;
 }
 
 body {
   background-color: var(--color-ink-950);
-  background-image: radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--color-brand-700) 12%, transparent), transparent);
   color: var(--color-ink-50);
 }
 
-/* cartão "vidro": fundo semitransparente + blur, usado no catálogo e no admin */
+/* cartão de superfície: usado no catálogo e no admin */
 .glass-card {
-  background-color: color-mix(in srgb, var(--color-ink-900) 70%, transparent);
-  backdrop-filter: blur(12px);
+  background-color: var(--color-ink-900);
   border: 1px solid var(--color-ink-800);
 }

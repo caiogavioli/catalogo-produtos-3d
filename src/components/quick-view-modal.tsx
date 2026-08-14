@@ -82,7 +82,7 @@ export function QuickViewModal({ product, onClose }: { product: Product; onClose
             </button>
 
             <h2 id={titleId} className="pr-8 text-xl font-bold text-ink-50">{product.name}</h2>
-            <p className="mt-1 text-lg text-brand-500">{formatPrice(product.price)}</p>
+            <p className="mt-1 font-mono text-lg text-accent-500">{formatPrice(product.price)}</p>
 
             {product.size && (
               <p className="mt-3 text-sm text-ink-200">
@@ -97,7 +97,7 @@ export function QuickViewModal({ product, onClose }: { product: Product; onClose
             <div className="mt-5 flex flex-wrap items-start gap-3">
               <Link
                 href={`/produto/${product.slug}`}
-                className="rounded bg-brand-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-800"
+                className="rounded bg-accent-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-800"
               >
                 Ver página completa
               </Link>

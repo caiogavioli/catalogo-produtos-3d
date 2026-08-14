@@ -60,13 +60,13 @@ export default async function ProdutoPage({
           {typedProduct.category && (
             <Link
               href={`/categoria/${typedProduct.category.slug}`}
-              className="text-sm font-medium text-brand-500 hover:underline"
+              className="text-sm font-medium text-accent-500 hover:underline"
             >
               {typedProduct.category.name}
             </Link>
           )}
           <h1 className="mt-1 text-2xl font-bold text-ink-50">{typedProduct.name}</h1>
-          <p className="mt-2 text-xl text-brand-500">{formatPrice(typedProduct.price)}</p>
+          <p className="mt-2 font-mono text-xl text-accent-500">{formatPrice(typedProduct.price)}</p>
 
           {typedProduct.size && (
             <p className="mt-4 text-sm text-ink-200">
