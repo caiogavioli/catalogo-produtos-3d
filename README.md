@@ -18,10 +18,13 @@ produtos a clientes. Hoje a única vitrine é um Instagram simples.
 - **Home com destaques**: banner/carrossel com os produtos marcados
   como "destacar" no admin, e uma seção "Mais vistos" automática.
 - **Área admin**: login para duas pessoas (mesma permissão), cadastro,
-  edição e remoção de produtos e categorias, checkbox de destaque.
-- **Página de cores disponíveis**: lista geral, independente de produto.
-- Botão de contato via WhatsApp por produto (opcional, via variável de
-  ambiente).
+  edição e remoção de produtos, categorias e cores, checkbox de destaque.
+- **Cores por produto**: cada produto é "cor única" (não mostra nada) ou
+  "várias cores" (mostra círculos das cores escolhidas pra ele, na
+  página do produto e na visualização rápida). Sem página pública
+  separada de cores — cadastro fica só no admin (`/admin/cores`).
+- Botão de contato via WhatsApp por produto, já com a cor escolhida na
+  mensagem quando aplicável (opcional, via variável de ambiente).
 - Sem PDF, sem checkout, sem domínio próprio pago — link gratuito do Vercel.
 - Sem raspagem automática do MakerWorld (descartada — ver Status):
   cadastro de produtos é manual, pelo painel admin.
@@ -99,11 +102,11 @@ ambiente no projeto Vercel, e usar o domínio gratuito `*.vercel.app`.
 
 Site (catálogo público + área admin) implementado com Next.js + Supabase e
 publicado no Vercel, incluindo destaques na home, "mais vistos", busca,
-ordenação/paginação, visualização rápida e contato via WhatsApp. Falta:
-confirmar que o schema, as migrações e as contas admin foram aplicados no
-projeto Supabase real, configurar as variáveis de ambiente no Vercel
-(incluindo `NEXT_PUBLIC_WHATSAPP_NUMBER`), adicionar o logo da marca e
-cadastrar os produtos pelo painel admin.
+ordenação/paginação, visualização rápida, cores por produto e contato via
+WhatsApp. Falta: confirmar que o schema, as migrações e as contas admin
+foram aplicados no projeto Supabase real, configurar as variáveis de
+ambiente no Vercel (incluindo `NEXT_PUBLIC_WHATSAPP_NUMBER`), adicionar o
+logo da marca e cadastrar os produtos pelo painel admin.
 
 A raspagem automática do MakerWorld, que estava no escopo original, foi
 **descartada**: o ambiente de implementação não tinha acesso de rede ao

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ProductCard } from "@/components/product-card";
 import { Pagination } from "@/components/pagination";
 import { PAGE_SIZE, pageRange, parsePage } from "@/lib/pagination";
+import { flattenProductColors } from "@/lib/colors";
 import type { Product } from "@/types/catalog";
 
 export default async function BuscaPage({
@@ -27,14 +28,14 @@ export default async function BuscaPage({
   const { data: products, count } = await supabase
     .from("products")
     .select(
-      "id, name, slug, description, size, price, category_id, featured, view_count, created_at, images:product_images(id, product_id, url, position)",
+      "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex))",
       { count: "exact" },
     )
     .ilike("name", `%${query}%`)
     .order("created_at", { ascending: false })
     .range(from, to);
 
-  const items = (products ?? []) as Product[];
+  const items = (products ?? []).map(flattenProductColors) as Product[];
   for (const product of items) {
     product.images?.sort((a, b) => a.position - b.position);
   }

@@ -20,6 +20,7 @@ create table if not exists products (
   category_id uuid references categories (id) on delete set null,
   featured boolean not null default false,
   view_count integer not null default 0,
+  color_mode text not null default 'unica' check (color_mode in ('unica', 'varias')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -37,11 +38,20 @@ create table if not exists colors (
   hex text
 );
 
+-- Só usada quando products.color_mode = 'varias' — quais cores (dentre
+-- as cadastradas em `colors`) esse produto específico tem disponível.
+create table if not exists product_colors (
+  product_id uuid not null references products (id) on delete cascade,
+  color_id uuid not null references colors (id) on delete cascade,
+  primary key (product_id, color_id)
+);
+
 create extension if not exists "pg_trgm";
 
 create index if not exists products_category_id_idx on products (category_id);
 create index if not exists product_images_product_id_idx on product_images (product_id);
 create index if not exists products_name_trgm_idx on products using gin (name gin_trgm_ops);
+create index if not exists product_colors_color_id_idx on product_colors (color_id);
 
 -- updated_at automático em products
 create or replace function set_updated_at()
@@ -78,21 +88,25 @@ alter table categories enable row level security;
 alter table products enable row level security;
 alter table product_images enable row level security;
 alter table colors enable row level security;
+alter table product_colors enable row level security;
 
 drop policy if exists "leitura pública" on categories;
 drop policy if exists "leitura pública" on products;
 drop policy if exists "leitura pública" on product_images;
 drop policy if exists "leitura pública" on colors;
+drop policy if exists "leitura pública" on product_colors;
 
 create policy "leitura pública" on categories for select using (true);
 create policy "leitura pública" on products for select using (true);
 create policy "leitura pública" on product_images for select using (true);
 create policy "leitura pública" on colors for select using (true);
+create policy "leitura pública" on product_colors for select using (true);
 
 drop policy if exists "escrita autenticada" on categories;
 drop policy if exists "escrita autenticada" on products;
 drop policy if exists "escrita autenticada" on product_images;
 drop policy if exists "escrita autenticada" on colors;
+drop policy if exists "escrita autenticada" on product_colors;
 
 create policy "escrita autenticada" on categories for all
   using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
@@ -101,6 +115,8 @@ create policy "escrita autenticada" on products for all
 create policy "escrita autenticada" on product_images for all
   using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 create policy "escrita autenticada" on colors for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "escrita autenticada" on product_colors for all
   using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 
 -- Storage: bucket público para fotos de produto.

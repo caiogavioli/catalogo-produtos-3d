@@ -36,6 +36,8 @@ type ParsedProductForm = {
   price: number | null;
   categoryId: string | null;
   featured: boolean;
+  colorMode: "unica" | "varias";
+  colorIds: string[];
 };
 
 function parseProductForm(formData: FormData): { data: ParsedProductForm } | { error: string } {
@@ -46,6 +48,8 @@ function parseProductForm(formData: FormData): { data: ParsedProductForm } | { e
   const size = String(formData.get("size") ?? "").trim() || null;
   const categoryId = String(formData.get("category_id") ?? "").trim() || null;
   const featured = formData.get("featured") === "on";
+  const colorMode = formData.get("color_mode") === "varias" ? "varias" : "unica";
+  const colorIds = colorMode === "varias" ? (formData.getAll("color_ids") as string[]) : [];
 
   const priceRaw = String(formData.get("price") ?? "").trim();
   let price: number | null = null;
@@ -56,7 +60,17 @@ function parseProductForm(formData: FormData): { data: ParsedProductForm } | { e
     if (!Number.isFinite(price)) return { error: "Preço inválido." };
   }
 
-  return { data: { name, description, size, price, categoryId, featured } };
+  return { data: { name, description, size, price, categoryId, featured, colorMode, colorIds } };
+}
+
+async function syncProductColors(productId: string, colorIds: string[]) {
+  const supabase = await createClient();
+  await supabase.from("product_colors").delete().eq("product_id", productId);
+  if (colorIds.length === 0) return;
+
+  const rows = colorIds.map((colorId) => ({ product_id: productId, color_id: colorId }));
+  const { error } = await supabase.from("product_colors").insert(rows);
+  if (error) throw new Error(error.message);
 }
 
 function storagePathFromUrl(url: string): string | null {
@@ -103,12 +117,21 @@ async function removeStorageFiles(urls: string[]) {
 export async function createProduct(_prevState: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = parseProductForm(formData);
   if ("error" in parsed) return { error: parsed.error };
-  const { name, description, size, price, categoryId, featured } = parsed.data;
+  const { name, description, size, price, categoryId, featured, colorMode, colorIds } = parsed.data;
 
   const supabase = await createClient();
   const { data: product, error } = await supabase
     .from("products")
-    .insert({ name, slug: slugify(name), description, size, price, category_id: categoryId, featured })
+    .insert({
+      name,
+      slug: slugify(name),
+      description,
+      size,
+      price,
+      category_id: categoryId,
+      featured,
+      color_mode: colorMode,
+    })
     .select("id")
     .single();
 
@@ -117,10 +140,11 @@ export async function createProduct(_prevState: ActionState, formData: FormData)
   }
 
   try {
+    await syncProductColors(product.id, colorIds);
     const files = formData.getAll("photos") as File[];
     await uploadProductImages(product.id, files);
   } catch (uploadError) {
-    return { error: uploadError instanceof Error ? uploadError.message : "Falha ao enviar fotos." };
+    return { error: uploadError instanceof Error ? uploadError.message : "Falha ao salvar o produto." };
   }
 
   revalidatePath("/");
@@ -135,21 +159,31 @@ export async function updateProduct(
 ): Promise<ActionState> {
   const parsed = parseProductForm(formData);
   if ("error" in parsed) return { error: parsed.error };
-  const { name, description, size, price, categoryId, featured } = parsed.data;
+  const { name, description, size, price, categoryId, featured, colorMode, colorIds } = parsed.data;
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("products")
-    .update({ name, slug: slugify(name), description, size, price, category_id: categoryId, featured })
+    .update({
+      name,
+      slug: slugify(name),
+      description,
+      size,
+      price,
+      category_id: categoryId,
+      featured,
+      color_mode: colorMode,
+    })
     .eq("id", id);
 
   if (error) return { error: error.message };
 
   try {
+    await syncProductColors(id, colorIds);
     const files = formData.getAll("photos") as File[];
     await uploadProductImages(id, files);
   } catch (uploadError) {
-    return { error: uploadError instanceof Error ? uploadError.message : "Falha ao enviar fotos." };
+    return { error: uploadError instanceof Error ? uploadError.message : "Falha ao salvar o produto." };
   }
 
   revalidatePath("/");
@@ -208,12 +242,12 @@ export async function createColor(_prevState: ActionState, formData: FormData): 
   if (error) return { error: error.message };
 
   revalidatePath("/admin/cores");
-  revalidatePath("/cores");
+  revalidatePath("/admin/produtos/novo");
 }
 
 export async function deleteColor(id: string) {
   const supabase = await createClient();
   await supabase.from("colors").delete().eq("id", id);
   revalidatePath("/admin/cores");
-  revalidatePath("/cores");
+  revalidatePath("/admin/produtos/novo");
 }

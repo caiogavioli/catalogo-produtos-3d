@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ProductCard } from "@/components/product-card";
 import { HeroCarousel } from "@/components/hero-carousel";
+import { flattenProductColors } from "@/lib/colors";
 import type { Category, Product } from "@/types/catalog";
 
 export default async function HomePage() {
@@ -11,11 +12,11 @@ export default async function HomePage() {
     supabase.from("categories").select("id, name, slug").order("name"),
     supabase
       .from("products")
-      .select("id, name, slug, description, size, price, category_id, featured, view_count, created_at, images:product_images(id, product_id, url, position)")
+      .select("id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex))")
       .order("created_at", { ascending: false }),
   ]);
 
-  const allProducts = (products ?? []) as Product[];
+  const allProducts = (products ?? []).map(flattenProductColors) as Product[];
   const productsByCategory = new Map<string, Product[]>();
   const semCategoria: Product[] = [];
 

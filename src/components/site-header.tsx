@@ -90,9 +90,6 @@ export function SiteHeader({ categories }: { categories: Category[] }) {
             Catálogo
           </Link>
           <CategoriasMenu categories={categories} />
-          <Link href="/cores" className="transition-colors hover:text-brand-200">
-            Cores disponíveis
-          </Link>
           <SearchForm className="w-48" />
         </nav>
 
@@ -133,13 +130,6 @@ export function SiteHeader({ categories }: { categories: Category[] }) {
                   {category.name}
                 </Link>
               ))}
-              <Link
-                href="/cores"
-                onClick={() => setMenuAberto(false)}
-                className="rounded px-2 py-2 hover:bg-ink-800"
-              >
-                Cores disponíveis
-              </Link>
             </div>
           </motion.nav>
         )}

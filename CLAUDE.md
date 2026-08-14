@@ -21,8 +21,13 @@ Entra:
   foto(s), nome, descrição, tamanho e preço (opcional, pode ficar em
   branco).
 - Área admin com login para 2 usuários, mesma permissão total (CRUD de
-  produtos e categorias), incluindo checkbox "destacar" por produto.
-- Página de cores disponíveis (lista geral, não é atributo por produto).
+  produtos e categorias), incluindo checkbox "destacar" por produto e
+  gestão das cores cadastradas (`/admin/cores`).
+- Cores **não têm página pública própria** (decisão de 2026-08-14,
+  substituiu a página `/cores` original). Cada produto tem
+  `color_mode`: "única" (não mostra nada) ou "várias" (mostra círculos
+  das cores escolhidas pra ele, na página do produto e na visualização
+  rápida). A cor escolhida pelo cliente entra na mensagem do WhatsApp.
 - Busca por nome de produto (`/busca`), com paginação.
 - Página de categoria com ordenação (recentes/preço) e paginação —
   necessário desde que o usuário avisou que o catálogo vai crescer pra
@@ -61,9 +66,9 @@ Não entra:
 mas **não** atualiza um banco que já existe (`create table if not
 exists` não adiciona coluna em tabela já criada). Toda mudança de schema
 feita depois do primeiro deploy também precisa de um arquivo de
-migração separado em `supabase/` (ex.: `migration-destaques-busca.sql`)
-pro usuário rodar manualmente no SQL Editor do Supabase — não temos
-acesso automatizado ao banco de produção.
+migração separado em `supabase/` (ex.: `migration-destaques-busca.sql`,
+`migration-cores-por-produto.sql`) pro usuário rodar manualmente no SQL
+Editor do Supabase — não temos acesso automatizado ao banco de produção.
 
 ## Riscos conhecidos
 

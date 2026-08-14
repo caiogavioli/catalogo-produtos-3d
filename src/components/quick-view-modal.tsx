@@ -3,16 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { MessageCircle, X } from "lucide-react";
+import { X } from "lucide-react";
 import { formatPrice } from "@/lib/format";
-import { whatsappLink } from "@/lib/whatsapp";
+import { ProductWhatsapp } from "@/components/product-whatsapp";
 import type { Product } from "@/types/catalog";
 
 // Usa os dados que o card já tem em mãos (vindos da listagem) — sem
 // buscar nada de novo no banco só para abrir a prévia.
 export function QuickViewModal({ product, onClose }: { product: Product; onClose: () => void }) {
   const cover = product.images?.[0];
-  const whatsapp = whatsappLink(product.name);
 
   return (
     <AnimatePresence>
@@ -71,24 +70,18 @@ export function QuickViewModal({ product, onClose }: { product: Product; onClose
               <p className="mt-3 line-clamp-4 text-sm text-ink-200">{product.description}</p>
             )}
 
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap items-start gap-3">
               <Link
                 href={`/produto/${product.slug}`}
                 className="rounded bg-brand-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-800"
               >
                 Ver página completa
               </Link>
-              {whatsapp && (
-                <a
-                  href={whatsapp}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700"
-                >
-                  <MessageCircle className="h-4 w-4" aria-hidden />
-                  WhatsApp
-                </a>
-              )}
+              <ProductWhatsapp
+                productName={product.name}
+                colorMode={product.color_mode}
+                colors={product.colors ?? []}
+              />
             </div>
           </div>
         </motion.div>

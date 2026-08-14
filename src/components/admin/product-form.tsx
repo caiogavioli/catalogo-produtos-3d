@@ -1,19 +1,23 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { deleteProductImage, type ActionState } from "@/app/admin/actions";
-import type { Category, Product } from "@/types/catalog";
+import type { Category, Color, Product } from "@/types/catalog";
 
 export function ProductForm({
   categories,
+  colors,
   product,
   action,
 }: {
   categories: Category[];
+  colors: Color[];
   product?: Product;
   action: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
+  const [colorMode, setColorMode] = useState<"unica" | "varias">(product?.color_mode ?? "unica");
+  const selectedColorIds = new Set(product?.colors?.map((color) => color.id) ?? []);
 
   return (
     <form action={formAction} className="max-w-xl space-y-4">
@@ -88,6 +92,70 @@ export function ProductForm({
           rows={4}
           className="mt-1 w-full rounded border border-ink-800 bg-ink-900 px-3 py-2 text-ink-50 placeholder:text-ink-400"
         />
+      </div>
+
+      <div>
+        <p className="block text-sm font-medium text-ink-200">Cores</p>
+        <div className="mt-1 flex gap-4 text-sm text-ink-200">
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="color_mode"
+              value="unica"
+              checked={colorMode === "unica"}
+              onChange={() => setColorMode("unica")}
+              className="accent-brand-700"
+            />
+            Cor única
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="color_mode"
+              value="varias"
+              checked={colorMode === "varias"}
+              onChange={() => setColorMode("varias")}
+              className="accent-brand-700"
+            />
+            Várias cores
+          </label>
+        </div>
+
+        {colorMode === "varias" && (
+          <div className="mt-3">
+            {colors.length === 0 ? (
+              <p className="text-sm text-ink-400">
+                Nenhuma cor cadastrada ainda — cadastre em{" "}
+                <a href="/admin/cores" className="text-brand-500 hover:underline">
+                  Cores
+                </a>
+                .
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-3">
+                {colors.map((color) => (
+                  <label
+                    key={color.id}
+                    className="flex items-center gap-2 rounded border border-ink-800 bg-ink-900 px-3 py-1.5 text-sm text-ink-200"
+                  >
+                    <input
+                      type="checkbox"
+                      name="color_ids"
+                      value={color.id}
+                      defaultChecked={selectedColorIds.has(color.id)}
+                      className="accent-brand-700"
+                    />
+                    <span
+                      className="h-4 w-4 rounded-full ring-1 ring-ink-800"
+                      style={{ backgroundColor: color.hex ?? "#ffffff" }}
+                    />
+                    {color.name}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <label className="flex items-center gap-2 text-sm text-ink-200">

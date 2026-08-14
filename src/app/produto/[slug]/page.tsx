@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MessageCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/format";
 import { incrementProductViews } from "@/lib/product-views";
-import { whatsappLink } from "@/lib/whatsapp";
+import { flattenProductColors } from "@/lib/colors";
+import { ProductWhatsapp } from "@/components/product-whatsapp";
 import type { Product } from "@/types/catalog";
 
 export default async function ProdutoPage({
@@ -19,16 +19,15 @@ export default async function ProdutoPage({
   const { data: product } = await supabase
     .from("products")
     .select(
-      "id, name, slug, description, size, price, category_id, featured, view_count, created_at, category:categories(id, name, slug), images:product_images(id, product_id, url, position)",
+      "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, category:categories(id, name, slug), images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex))",
     )
     .eq("slug", slug)
     .single();
 
   if (!product) notFound();
 
-  const typedProduct = product as unknown as Product;
+  const typedProduct = flattenProductColors(product) as unknown as Product;
   const images = [...(typedProduct.images ?? [])].sort((a, b) => a.position - b.position);
-  const whatsapp = whatsappLink(typedProduct.name);
 
   await incrementProductViews(typedProduct.id);
 
@@ -79,17 +78,13 @@ export default async function ProdutoPage({
             <p className="mt-4 whitespace-pre-line text-ink-200">{typedProduct.description}</p>
           )}
 
-          {whatsapp && (
-            <a
-              href={whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 rounded bg-green-600 px-4 py-2 font-medium text-white transition-colors hover:bg-green-700"
-            >
-              <MessageCircle className="h-5 w-5" aria-hidden />
-              Perguntar no WhatsApp
-            </a>
-          )}
+          <div className="mt-6">
+            <ProductWhatsapp
+              productName={typedProduct.name}
+              colorMode={typedProduct.color_mode}
+              colors={typedProduct.colors ?? []}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -11,6 +11,8 @@ export type ProductImage = {
   position: number;
 };
 
+export type ColorMode = "unica" | "varias";
+
 export type Product = {
   id: string;
   name: string;
@@ -21,9 +23,11 @@ export type Product = {
   category_id: string | null;
   featured: boolean;
   view_count: number;
+  color_mode: ColorMode;
   created_at: string;
   category?: Category | null;
   images?: ProductImage[];
+  colors?: Color[];
 };
 
 export type Color = {
