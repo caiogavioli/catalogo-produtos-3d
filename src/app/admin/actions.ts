@@ -75,6 +75,26 @@ function parseProductForm(formData: FormData): { data: ParsedProductForm } | { e
   return { data: { name, description, size, price, categoryId, featured, colorMode, colorIds } };
 }
 
+// Gera um slug garantidamente livre, acrescentando -2, -3... quando o
+// nome do produto já resultou no mesmo slug de outro (ex.: dois produtos
+// chamados "Vaso espiral"). excludeId evita que editar um produto colida
+// com o próprio slug dele mesmo.
+async function uniqueSlug(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  table: "products" | "categories",
+  base: string,
+  excludeId?: string,
+): Promise<string> {
+  let candidate = base;
+  for (let suffix = 2; ; suffix++) {
+    let query = supabase.from(table).select("id").eq("slug", candidate);
+    if (excludeId) query = query.neq("id", excludeId);
+    const { data } = await query.limit(1);
+    if (!data || data.length === 0) return candidate;
+    candidate = `${base}-${suffix}`;
+  }
+}
+
 async function syncProductColors(productId: string, colorIds: string[]) {
   const supabase = await createClient();
   await supabase.from("product_colors").delete().eq("product_id", productId);
@@ -132,11 +152,12 @@ export async function createProduct(_prevState: ActionState, formData: FormData)
   const { name, description, size, price, categoryId, featured, colorMode, colorIds } = parsed.data;
 
   const supabase = await requireAdmin();
+  const slug = await uniqueSlug(supabase, "products", slugify(name));
   const { data: product, error } = await supabase
     .from("products")
     .insert({
       name,
-      slug: slugify(name),
+      slug,
       description,
       size,
       price,
@@ -174,11 +195,12 @@ export async function updateProduct(
   const { name, description, size, price, categoryId, featured, colorMode, colorIds } = parsed.data;
 
   const supabase = await requireAdmin();
+  const slug = await uniqueSlug(supabase, "products", slugify(name), id);
   const { error } = await supabase
     .from("products")
     .update({
       name,
-      slug: slugify(name),
+      slug,
       description,
       size,
       price,
@@ -234,7 +256,8 @@ export async function createCategory(_prevState: ActionState, formData: FormData
   if (!name) return { error: "Nome é obrigatório." };
 
   const supabase = await requireAdmin();
-  const { error } = await supabase.from("categories").insert({ name, slug: slugify(name) });
+  const slug = await uniqueSlug(supabase, "categories", slugify(name));
+  const { error } = await supabase.from("categories").insert({ name, slug });
   if (error) return { error: error.message };
 
   revalidatePath("/admin/categorias");
