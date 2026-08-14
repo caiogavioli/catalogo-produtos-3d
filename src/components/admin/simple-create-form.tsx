@@ -15,22 +15,22 @@ export function SimpleCreateForm({
   return (
     <form action={formAction} className="flex flex-wrap items-end gap-3">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-metal-700">
+        <label htmlFor="name" className="block text-sm font-medium text-ink-200">
           Nome
         </label>
         <input
           id="name"
           name="name"
           required
-          className="mt-1 rounded border border-metal-300 px-3 py-2"
+          className="mt-1 rounded border border-ink-800 bg-ink-900 px-3 py-2 text-ink-50 placeholder:text-ink-400"
         />
       </div>
       {withHex && (
         <div>
-          <label htmlFor="hex" className="block text-sm font-medium text-metal-700">
+          <label htmlFor="hex" className="block text-sm font-medium text-ink-200">
             Cor (opcional)
           </label>
-          <input id="hex" name="hex" type="color" className="mt-1 h-10 w-16 rounded border border-metal-300" />
+          <input id="hex" name="hex" type="color" className="mt-1 h-10 w-16 rounded border border-ink-800" />
         </div>
       )}
       <button
@@ -40,7 +40,7 @@ export function SimpleCreateForm({
       >
         {pending ? "Adicionando..." : "Adicionar"}
       </button>
-      {state?.error && <p className="w-full text-sm text-red-600">{state.error}</p>}
+      {state?.error && <p className="w-full text-sm text-red-400">{state.error}</p>}
     </form>
   );
 }

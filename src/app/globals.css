@@ -1,29 +1,42 @@
 @import "tailwindcss";
 
 /*
- * Paleta placeholder (roxo/metálico). Ajustar quando o arquivo do logo
- * for adicionado em assets/logo/ — ver CLAUDE.md, seção Identidade visual.
+ * Paleta CMG3D: tema escuro "chumbo", acento cobre/laranja (referência ao
+ * filamento aquecido). Trocar quando o arquivo do logo for adicionado em
+ * assets/logo/ — ver CLAUDE.md, seção Identidade visual.
+ *
+ * Convenção: quanto MAIOR o número, mais escuro (padrão Tailwind). Em
+ * `ink`, 950 é a superfície mais escura (fundo) e 50 é quase branco
+ * (texto principal) — o inverso do que soaria natural num tema claro,
+ * mas é o que mantém a leitura "100 claro / 900 escuro" consistente.
  */
 @theme {
-  --color-brand-50: #f5f3ff;
-  --color-brand-100: #ede9fe;
-  --color-brand-200: #ddd6fe;
-  --color-brand-300: #c4b5fd;
-  --color-brand-400: #a78bfa;
-  --color-brand-500: #8b5cf6;
-  --color-brand-600: #7c3aed;
-  --color-brand-700: #6d28d9;
-  --color-brand-800: #5b21b6;
-  --color-brand-900: #4c1d95;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  --color-metal-100: #f1f2f4;
-  --color-metal-300: #cdd0d6;
-  --color-metal-500: #8c919c;
-  --color-metal-700: #4a4e57;
-  --color-metal-900: #1f2126;
+  /* acento cobre/laranja */
+  --color-brand-200: #ffcfa3; /* realce claro (hover em texto sobre fundo escuro) */
+  --color-brand-500: #e8672c; /* texto/links/ícones de destaque sobre fundo escuro */
+  --color-brand-700: #c2501e; /* fundo sólido de botão (par com texto branco) */
+  --color-brand-800: #a8431a; /* hover do botão sólido */
+
+  /* superfícies e texto — cinza chumbo */
+  --color-ink-50: #f4f5f6; /* texto principal (quase branco) */
+  --color-ink-200: #cdd0d5; /* texto secundário */
+  --color-ink-400: #9a9fa8; /* texto apagado / placeholder */
+  --color-ink-800: #2b2e34; /* bordas, divisores */
+  --color-ink-900: #1a1c20; /* superfície de cartão (usada com transparência) */
+  --color-ink-950: #101114; /* fundo da página */
 }
 
 body {
-  background-color: var(--color-metal-100);
-  color: var(--color-metal-900);
+  background-color: var(--color-ink-950);
+  background-image: radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--color-brand-700) 12%, transparent), transparent);
+  color: var(--color-ink-50);
+}
+
+/* cartão "vidro": fundo semitransparente + blur, usado no catálogo e no admin */
+.glass-card {
+  background-color: color-mix(in srgb, var(--color-ink-900) 70%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-ink-800);
 }

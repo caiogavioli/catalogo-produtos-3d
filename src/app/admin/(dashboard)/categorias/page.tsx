@@ -11,17 +11,17 @@ export default async function AdminCategoriasPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold text-metal-900">Categorias</h1>
+      <h1 className="mb-6 text-2xl font-bold text-ink-50">Categorias</h1>
 
       <SimpleCreateForm action={createCategory} />
 
       {items.length === 0 ? (
-        <p className="mt-6 text-metal-500">Nenhuma categoria cadastrada ainda.</p>
+        <p className="mt-6 text-ink-400">Nenhuma categoria cadastrada ainda.</p>
       ) : (
-        <ul className="mt-6 divide-y divide-metal-100">
+        <ul className="mt-6 divide-y divide-ink-950">
           {items.map((category) => (
             <li key={category.id} className="flex items-center justify-between py-2">
-              <span className="text-metal-900">{category.name}</span>
+              <span className="text-ink-50">{category.name}</span>
               <DeleteButton action={deleteCategory.bind(null, category.id)} />
             </li>
           ))}

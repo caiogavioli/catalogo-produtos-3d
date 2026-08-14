@@ -10,7 +10,7 @@ export function DeleteButton({ action, label = "Excluir" }: { action: () => Prom
         }
       }}
     >
-      <button type="submit" className="text-sm text-red-600 hover:underline">
+      <button type="submit" className="text-sm text-red-400 hover:underline">
         {label}
       </button>
     </form>

@@ -32,9 +32,9 @@ export default async function CategoriaPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="mb-6 text-2xl font-bold text-metal-900">{category.name}</h1>
+      <h1 className="mb-6 text-2xl font-bold text-ink-50">{category.name}</h1>
       {items.length === 0 ? (
-        <p className="text-metal-500">Nenhum produto nesta categoria ainda.</p>
+        <p className="text-ink-400">Nenhum produto nesta categoria ainda.</p>
       ) : (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {items.map((product) => (

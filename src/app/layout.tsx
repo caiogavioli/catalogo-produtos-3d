@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import Link from "next/link";
+import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "CMG3D — Catálogo de produtos de impressão 3D",
@@ -11,28 +15,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR">
-      <body className="min-h-screen flex flex-col antialiased">
-        <header className="bg-brand-800 text-white">
-          <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="text-xl font-bold tracking-tight">
-              CMG3D
-            </Link>
-            <nav className="flex gap-4 text-sm">
-              <Link href="/" className="hover:text-brand-200">
-                Catálogo
-              </Link>
-              <Link href="/cores" className="hover:text-brand-200">
-                Cores disponíveis
-              </Link>
-            </nav>
-          </div>
-        </header>
+    <html lang="pt-BR" className={inter.variable}>
+      <body className="flex min-h-screen flex-col font-sans antialiased">
+        <SiteHeader />
         <main className="flex-1">{children}</main>
-        <footer className="bg-metal-900 text-metal-300 text-sm">
+        <footer className="border-t border-ink-800 bg-ink-950 text-sm">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-6">
-            <span>CMG3D</span>
-            <Link href="/admin" className="text-metal-500 hover:text-metal-300">
+            <span className="text-ink-400">CMG3D</span>
+            <Link href="/admin" className="text-ink-400 transition-colors hover:text-ink-200">
               Área admin
             </Link>
           </div>

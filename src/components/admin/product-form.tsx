@@ -18,7 +18,7 @@ export function ProductForm({
   return (
     <form action={formAction} className="max-w-xl space-y-4">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-metal-700">
+        <label htmlFor="name" className="block text-sm font-medium text-ink-200">
           Nome
         </label>
         <input
@@ -26,19 +26,19 @@ export function ProductForm({
           name="name"
           defaultValue={product?.name}
           required
-          className="mt-1 w-full rounded border border-metal-300 px-3 py-2"
+          className="mt-1 w-full rounded border border-ink-800 bg-ink-900 px-3 py-2 text-ink-50 placeholder:text-ink-400"
         />
       </div>
 
       <div>
-        <label htmlFor="category_id" className="block text-sm font-medium text-metal-700">
+        <label htmlFor="category_id" className="block text-sm font-medium text-ink-200">
           Categoria
         </label>
         <select
           id="category_id"
           name="category_id"
           defaultValue={product?.category_id ?? ""}
-          className="mt-1 w-full rounded border border-metal-300 px-3 py-2"
+          className="mt-1 w-full rounded border border-ink-800 bg-ink-900 px-3 py-2 text-ink-50 placeholder:text-ink-400"
         >
           <option value="">Sem categoria</option>
           {categories.map((category) => (
@@ -51,7 +51,7 @@ export function ProductForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="size" className="block text-sm font-medium text-metal-700">
+          <label htmlFor="size" className="block text-sm font-medium text-ink-200">
             Tamanho
           </label>
           <input
@@ -59,11 +59,11 @@ export function ProductForm({
             name="size"
             defaultValue={product?.size ?? ""}
             placeholder="ex.: 10x10x15cm"
-            className="mt-1 w-full rounded border border-metal-300 px-3 py-2"
+            className="mt-1 w-full rounded border border-ink-800 bg-ink-900 px-3 py-2 text-ink-50 placeholder:text-ink-400"
           />
         </div>
         <div>
-          <label htmlFor="price" className="block text-sm font-medium text-metal-700">
+          <label htmlFor="price" className="block text-sm font-medium text-ink-200">
             Preço (R$, opcional)
           </label>
           <input
@@ -72,13 +72,13 @@ export function ProductForm({
             defaultValue={product?.price ?? ""}
             placeholder="deixe em branco para sob consulta"
             inputMode="decimal"
-            className="mt-1 w-full rounded border border-metal-300 px-3 py-2"
+            className="mt-1 w-full rounded border border-ink-800 bg-ink-900 px-3 py-2 text-ink-50 placeholder:text-ink-400"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-metal-700">
+        <label htmlFor="description" className="block text-sm font-medium text-ink-200">
           Descrição
         </label>
         <textarea
@@ -86,13 +86,13 @@ export function ProductForm({
           name="description"
           defaultValue={product?.description ?? ""}
           rows={4}
-          className="mt-1 w-full rounded border border-metal-300 px-3 py-2"
+          className="mt-1 w-full rounded border border-ink-800 bg-ink-900 px-3 py-2 text-ink-50 placeholder:text-ink-400"
         />
       </div>
 
       {product?.images && product.images.length > 0 && (
         <div>
-          <p className="block text-sm font-medium text-metal-700">Fotos atuais</p>
+          <p className="block text-sm font-medium text-ink-200">Fotos atuais</p>
           <div className="mt-2 grid grid-cols-4 gap-2">
             {product.images.map((image) => (
               <div key={image.id} className="group relative aspect-square">
@@ -119,7 +119,7 @@ export function ProductForm({
       )}
 
       <div>
-        <label htmlFor="photos" className="block text-sm font-medium text-metal-700">
+        <label htmlFor="photos" className="block text-sm font-medium text-ink-200">
           {product ? "Adicionar fotos" : "Fotos"}
         </label>
         <input
@@ -132,7 +132,7 @@ export function ProductForm({
         />
       </div>
 
-      {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
 
       <button
         type="submit"

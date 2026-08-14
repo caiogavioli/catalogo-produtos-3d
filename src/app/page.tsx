@@ -32,7 +32,7 @@ export default async function HomePage() {
 
   if (categoriesList.length === 0 && semCategoria.length === 0) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-16 text-center text-metal-500">
+      <div className="mx-auto max-w-5xl px-4 py-16 text-center text-ink-400">
         Catálogo ainda sem produtos cadastrados.
       </div>
     );
@@ -46,8 +46,8 @@ export default async function HomePage() {
         return (
           <section key={category.id}>
             <div className="mb-4 flex items-baseline justify-between">
-              <h2 className="text-xl font-bold text-metal-900">{category.name}</h2>
-              <Link href={`/categoria/${category.slug}`} className="text-sm text-brand-700 hover:underline">
+              <h2 className="text-xl font-bold text-ink-50">{category.name}</h2>
+              <Link href={`/categoria/${category.slug}`} className="text-sm text-brand-500 hover:underline">
                 ver tudo
               </Link>
             </div>
@@ -62,7 +62,7 @@ export default async function HomePage() {
 
       {semCategoria.length > 0 && (
         <section>
-          <h2 className="mb-4 text-xl font-bold text-metal-900">Outros produtos</h2>
+          <h2 className="mb-4 text-xl font-bold text-ink-50">Outros produtos</h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {semCategoria.map((product) => (
               <ProductCard key={product.id} product={product} />

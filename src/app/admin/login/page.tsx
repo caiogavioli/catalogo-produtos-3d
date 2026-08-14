@@ -8,10 +8,10 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto max-w-sm px-4 py-16">
-      <h1 className="mb-6 text-2xl font-bold text-metal-900">Entrar</h1>
+      <h1 className="mb-6 text-2xl font-bold text-ink-50">Entrar</h1>
       <form action={formAction} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-metal-700">
+          <label htmlFor="email" className="block text-sm font-medium text-ink-200">
             E-mail
           </label>
           <input
@@ -19,11 +19,11 @@ export default function LoginPage() {
             name="email"
             type="email"
             required
-            className="mt-1 w-full rounded border border-metal-300 px-3 py-2"
+            className="mt-1 w-full rounded border border-ink-800 bg-ink-900 px-3 py-2 text-ink-50 placeholder:text-ink-400"
           />
         </div>
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-metal-700">
+          <label htmlFor="password" className="block text-sm font-medium text-ink-200">
             Senha
           </label>
           <input
@@ -31,10 +31,10 @@ export default function LoginPage() {
             name="password"
             type="password"
             required
-            className="mt-1 w-full rounded border border-metal-300 px-3 py-2"
+            className="mt-1 w-full rounded border border-ink-800 bg-ink-900 px-3 py-2 text-ink-50 placeholder:text-ink-400"
           />
         </div>
-        {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+        {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
         <button
           type="submit"
           disabled={pending}
