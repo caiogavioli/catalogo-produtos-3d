@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 /*
- * Paleta CMG3D: tema escuro "chumbo", acento cobre/laranja (referência ao
- * filamento aquecido). Trocar quando o arquivo do logo for adicionado em
- * assets/logo/ — ver CLAUDE.md, seção Identidade visual.
+ * Paleta CMG3D: tema escuro "chumbo", acento roxo metálico (cor da marca).
+ * Trocar quando o arquivo do logo for adicionado em assets/logo/ — ver
+ * CLAUDE.md, seção Identidade visual.
  *
  * Convenção: quanto MAIOR o número, mais escuro (padrão Tailwind). Em
  * `ink`, 950 é a superfície mais escura (fundo) e 50 é quase branco
@@ -13,11 +13,11 @@
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  /* acento cobre/laranja */
-  --color-brand-200: #ffcfa3; /* realce claro (hover em texto sobre fundo escuro) */
-  --color-brand-500: #e8672c; /* texto/links/ícones de destaque sobre fundo escuro */
-  --color-brand-700: #c2501e; /* fundo sólido de botão (par com texto branco) */
-  --color-brand-800: #a8431a; /* hover do botão sólido */
+  /* acento roxo metálico */
+  --color-brand-200: #ddd6fe; /* realce claro (hover em texto sobre fundo escuro) */
+  --color-brand-500: #a78bfa; /* texto/links/ícones de destaque sobre fundo escuro */
+  --color-brand-700: #7c3aed; /* fundo sólido de botão (par com texto branco) */
+  --color-brand-800: #6d28d9; /* hover do botão sólido */
 
   /* superfícies e texto — cinza chumbo */
   --color-ink-50: #f4f5f6; /* texto principal (quase branco) */

@@ -57,13 +57,14 @@ Não entra:
 Marca CMG3D. Logo fornecido pelo usuário — roxo/metálico, tipografia bold
 angular, ilustração de família na composição (ainda não salvo como
 arquivo no repo). Visual do site (redefinido em 2026-08-14, a pedido do
-usuário): tema **escuro** ("cinza chumbo"), acento **cobre/laranja**
-(referência a filamento aquecido), cartões com leve efeito vidro (glass,
-`bg-ink-900` translúcido + blur), fonte Inter, ícones Lucide, pequenas
-animações de entrada/hover com Framer Motion. Tokens de cor em
-`src/app/globals.css` (`ink-*` = superfícies/texto em cinza chumbo,
-`brand-*` = acento cobre). Ajustar quando o logo real virar arquivo —
-pode influenciar o tom exato do cobre.
+usuário): tema **escuro** ("cinza chumbo"), acento **roxo metálico** (cor
+da marca — testado brevemente com cobre/laranja, revertido no mesmo dia
+a pedido do usuário), cartões com leve efeito vidro (glass, `bg-ink-900`
+translúcido + blur), fonte Inter, ícones Lucide, pequenas animações de
+entrada/hover com Framer Motion, menu de categorias no cabeçalho. Tokens
+de cor em `src/app/globals.css` (`ink-*` = superfícies/texto em cinza
+chumbo, `brand-*` = acento roxo). Ajustar quando o logo real virar
+arquivo — pode influenciar o tom exato do roxo.
 
 ## Convenções
 
