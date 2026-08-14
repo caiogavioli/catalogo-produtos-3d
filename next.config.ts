@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
   // CLAUDE.md deste repo é mantido manualmente (ver convenção do
   // Brainstorm) — não deixar o `next dev` anexar o bloco de regras dele.
   agentRules: false,
+  experimental: {
+    serverActions: {
+      // Padrão do Next.js é 1MB por requisição de Server Action — uma
+      // foto tirada de celular passa disso fácil e a requisição falha
+      // com erro genérico de servidor. Cadastro de produto pode enviar
+      // várias fotos numa única submissão, então o limite precisa cobrir
+      // o conjunto, não uma foto isolada.
+      bodySizeLimit: "20mb",
+    },
+  },
   images: {
     remotePatterns: [
       ...(supabaseHost
