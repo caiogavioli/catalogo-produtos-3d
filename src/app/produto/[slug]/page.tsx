@@ -30,7 +30,7 @@ export default async function ProdutoPage({
     <div className="mx-auto max-w-5xl px-4 py-10">
       <div className="grid gap-8 md:grid-cols-2">
         <div className="space-y-3">
-          <div className="relative aspect-square overflow-hidden rounded-lg bg-metal-100">
+          <div className="relative aspect-square overflow-hidden rounded-lg bg-metal-100 ring-1 ring-inset ring-metal-300">
             {images[0] ? (
               <Image src={images[0].url} alt={typedProduct.name} fill sizes="50vw" className="object-cover" />
             ) : (
@@ -40,7 +40,10 @@ export default async function ProdutoPage({
           {images.length > 1 && (
             <div className="grid grid-cols-4 gap-2">
               {images.slice(1).map((image) => (
-                <div key={image.id} className="relative aspect-square overflow-hidden rounded bg-metal-100">
+                <div
+                  key={image.id}
+                  className="relative aspect-square overflow-hidden rounded bg-metal-100 ring-1 ring-inset ring-metal-300"
+                >
                   <Image src={image.url} alt={typedProduct.name} fill sizes="12vw" className="object-cover" />
                 </div>
               ))}

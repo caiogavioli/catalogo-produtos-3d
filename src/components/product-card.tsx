@@ -11,7 +11,7 @@ export function ProductCard({ product }: { product: Product }) {
       href={`/produto/${product.slug}`}
       className="group block overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-metal-300 transition hover:shadow-md"
     >
-      <div className="relative aspect-square bg-metal-100">
+      <div className="relative aspect-square bg-metal-100 ring-1 ring-inset ring-metal-300">
         {cover ? (
           <Image
             src={cover.url}
