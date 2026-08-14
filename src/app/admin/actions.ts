@@ -265,6 +265,26 @@ export async function createColor(_prevState: ActionState, formData: FormData): 
   return { success: true };
 }
 
+export async function updateColor(
+  id: string,
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return { error: "Nome é obrigatório." };
+  const hex = String(formData.get("hex") ?? "").trim() || null;
+  const metallic = formData.get("metallic") === "on";
+
+  const supabase = await requireAdmin();
+  const { error } = await supabase.from("colors").update({ name, hex, metallic }).eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/cores");
+  revalidatePath("/admin/produtos/novo");
+  revalidatePath("/");
+  return { success: true };
+}
+
 export async function deleteColor(id: string) {
   const supabase = await requireAdmin();
   const { error } = await supabase.from("colors").delete().eq("id", id);

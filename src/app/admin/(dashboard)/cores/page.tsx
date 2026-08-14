@@ -1,8 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createColor, deleteColor } from "../../actions";
 import { SimpleCreateForm } from "@/components/admin/simple-create-form";
-import { DeleteButton } from "@/components/admin/delete-button";
-import { colorSwatchStyle } from "@/lib/colors";
+import { EditColorRow } from "@/components/admin/edit-color-row";
 import type { Color } from "@/types/catalog";
 
 export default async function AdminCoresPage() {
@@ -21,14 +20,7 @@ export default async function AdminCoresPage() {
       ) : (
         <ul className="mt-6 divide-y divide-ink-950">
           {items.map((color) => (
-            <li key={color.id} className="flex items-center justify-between py-2">
-              <span className="flex items-center gap-2 text-ink-50">
-                <span className="h-5 w-5 rounded-full ring-1 ring-ink-800" style={colorSwatchStyle(color)} />
-                {color.name}
-                {color.metallic && <span className="text-xs text-ink-400">(metálica)</span>}
-              </span>
-              <DeleteButton action={deleteColor.bind(null, color.id)} />
-            </li>
+            <EditColorRow key={color.id} color={color} deleteAction={deleteColor.bind(null, color.id)} />
           ))}
         </ul>
       )}
