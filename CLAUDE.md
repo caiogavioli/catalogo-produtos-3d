@@ -89,32 +89,33 @@ Marca CMG3D. Logo fornecido pelo usuário — roxo/metálico, tipografia bold
 angular, ilustração de família na composição (ainda não salvo como
 arquivo no repo).
 
-Visual do site — v3, redefinido em 2026-08-14 depois de uma pesquisa de
-mercado em catálogos/marketplaces de impressão 3D (MakerWorld, Printables,
-Bambu Store), que apontou o visual anterior (roxo sobre preto + cards de
-vidro) como o clichê genérico de SaaS, não o padrão do nicho. Decisão do
-usuário foi misturar as duas direções propostas:
+Visual do site passou por duas rodadas no mesmo dia (2026-08-14). A v3
+testou uma pesquisa de mercado em catálogos de impressão 3D (MakerWorld,
+Printables, Bambu Store) que apontou o roxo-sobre-preto-com-glass como
+clichê genérico de SaaS — tentou trocar o acento por âmbar + ciano,
+reservando o roxo só pra 3 pontos de identidade. **O usuário não gostou**
+e pediu pra voltar tudo pro roxo. v4 (atual), estável:
 
-- Tema **escuro carvão neutro** (sem o glow roxo de fundo da versão
-  anterior), sem glassmorphism — cartões viram superfície sólida
-  (`.glass-card` continua com esse nome por história, mas hoje é só
-  `bg-ink-900` + borda, sem blur).
-- **Âmbar** (`accent-*`, cor de filamento fundido) é o acento funcional
-  principal: preço, botões de ação, badge "Novo", links.
-- **Ciano** (`teal-*`) marca estado ativo/selecionado: foco de teclado,
-  cor de produto selecionada, checkbox/radio marcado, aba ativa de
-  ordenação.
-- **Roxo metálico** (`brand-*`, a cor real da marca) fica reservado só
-  pra identidade — ícone do logo no cabeçalho, selo "Destaque" e
-  indicador ativo do carrossel da home. Não deve virar acento de botão
-  ou de link comum de novo; é o que evita competir com os acentos
-  funcionais em todo o resto do site.
+- **Roxo metálico é o acento único do site inteiro** de novo — preço,
+  botões de ação, badge "Novo", links, foco e seleção. `brand-300`
+  (tom mais claro) marca foco/seleção; `brand-700` é o preenchimento
+  sólido de botão; `brand-900` marca estado ativo mais forte (ex.: aba
+  de ordenação selecionada). Tudo dentro da mesma família — não separar
+  de novo em acentos de cores diferentes sem pedido explícito.
+- **Cinza metálico** (`steel-*`) é a segunda voz, não um acento novo —
+  usado com moderação em texto técnico (ficha técnica do produto, rótulo
+  "(metálica)" no admin).
+- `ink-*` (superfícies/texto) tem uma leve nuance violeta-acinzentada em
+  vez de cinza puro, pra combinar com o roxo em vez de competir.
+- Sem glassmorphism — `.glass-card` (nome mantido por história) é
+  superfície sólida com um gradiente sutil de "metal escovado", não
+  vidro/blur.
 - Preço em fonte monoespaçada (`font-mono`), lendo como dado técnico.
 
 Fonte Inter (corpo/UI), ícones Lucide, pequenas animações de
 entrada/hover com Framer Motion, menu de categorias no cabeçalho. Tokens
 de cor em `src/app/globals.css`. Ajustar quando o logo real virar
-arquivo — pode influenciar o tom exato do roxo reservado.
+arquivo — pode influenciar o tom exato do roxo.
 
 ## Convenções
 
