@@ -19,6 +19,8 @@ export type Product = {
   size: string | null;
   price: number | null;
   category_id: string | null;
+  featured: boolean;
+  view_count: number;
   created_at: string;
   category?: Category | null;
   images?: ProductImage[];

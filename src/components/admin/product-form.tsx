@@ -90,6 +90,16 @@ export function ProductForm({
         />
       </div>
 
+      <label className="flex items-center gap-2 text-sm text-ink-200">
+        <input
+          type="checkbox"
+          name="featured"
+          defaultChecked={product?.featured ?? false}
+          className="h-4 w-4 rounded border-ink-800 bg-ink-900 accent-brand-700"
+        />
+        Destacar na home (banner do topo)
+      </label>
+
       {product?.images && product.images.length > 0 && (
         <div>
           <p className="block text-sm font-medium text-ink-200">Fotos atuais</p>

@@ -18,6 +18,8 @@ create table if not exists products (
   size text,
   price numeric(10, 2),
   category_id uuid references categories (id) on delete set null,
+  featured boolean not null default false,
+  view_count integer not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -35,8 +37,11 @@ create table if not exists colors (
   hex text
 );
 
+create extension if not exists "pg_trgm";
+
 create index if not exists products_category_id_idx on products (category_id);
 create index if not exists product_images_product_id_idx on product_images (product_id);
+create index if not exists products_name_trgm_idx on products using gin (name gin_trgm_ops);
 
 -- updated_at automático em products
 create or replace function set_updated_at()
@@ -52,6 +57,20 @@ create trigger products_set_updated_at
   before update on products
   for each row
   execute function set_updated_at();
+
+-- Contador de visualizações: incrementado a partir da página pública do
+-- produto (usuário anônimo). security definer pra não precisar dar
+-- permissão de update geral em products só por causa desse contador.
+create or replace function increment_product_views(product_id uuid)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update products set view_count = view_count + 1 where id = product_id;
+$$;
+
+grant execute on function increment_product_views(uuid) to anon, authenticated;
 
 -- RLS: catálogo é público para leitura; escrita só para usuários autenticados
 -- (as duas contas admin, criadas manualmente no painel Auth do Supabase).

@@ -9,7 +9,7 @@ export default async function AdminProdutosPage() {
   const supabase = await createClient();
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, slug, description, size, price, category_id, created_at, category:categories(id, name, slug)")
+    .select("id, name, slug, description, size, price, category_id, featured, view_count, created_at, category:categories(id, name, slug)")
     .order("created_at", { ascending: false });
 
   const items = (products ?? []) as unknown as Product[];

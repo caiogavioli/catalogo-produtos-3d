@@ -35,6 +35,7 @@ type ParsedProductForm = {
   size: string | null;
   price: number | null;
   categoryId: string | null;
+  featured: boolean;
 };
 
 function parseProductForm(formData: FormData): { data: ParsedProductForm } | { error: string } {
@@ -44,6 +45,7 @@ function parseProductForm(formData: FormData): { data: ParsedProductForm } | { e
   const description = String(formData.get("description") ?? "").trim() || null;
   const size = String(formData.get("size") ?? "").trim() || null;
   const categoryId = String(formData.get("category_id") ?? "").trim() || null;
+  const featured = formData.get("featured") === "on";
 
   const priceRaw = String(formData.get("price") ?? "").trim();
   let price: number | null = null;
@@ -54,7 +56,7 @@ function parseProductForm(formData: FormData): { data: ParsedProductForm } | { e
     if (!Number.isFinite(price)) return { error: "Preço inválido." };
   }
 
-  return { data: { name, description, size, price, categoryId } };
+  return { data: { name, description, size, price, categoryId, featured } };
 }
 
 function storagePathFromUrl(url: string): string | null {
@@ -101,12 +103,12 @@ async function removeStorageFiles(urls: string[]) {
 export async function createProduct(_prevState: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = parseProductForm(formData);
   if ("error" in parsed) return { error: parsed.error };
-  const { name, description, size, price, categoryId } = parsed.data;
+  const { name, description, size, price, categoryId, featured } = parsed.data;
 
   const supabase = await createClient();
   const { data: product, error } = await supabase
     .from("products")
-    .insert({ name, slug: slugify(name), description, size, price, category_id: categoryId })
+    .insert({ name, slug: slugify(name), description, size, price, category_id: categoryId, featured })
     .select("id")
     .single();
 
@@ -133,12 +135,12 @@ export async function updateProduct(
 ): Promise<ActionState> {
   const parsed = parseProductForm(formData);
   if ("error" in parsed) return { error: parsed.error };
-  const { name, description, size, price, categoryId } = parsed.data;
+  const { name, description, size, price, categoryId, featured } = parsed.data;
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("products")
-    .update({ name, slug: slugify(name), description, size, price, category_id: categoryId })
+    .update({ name, slug: slugify(name), description, size, price, category_id: categoryId, featured })
     .eq("id", id);
 
   if (error) return { error: error.message };

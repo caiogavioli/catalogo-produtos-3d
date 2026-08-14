@@ -11,12 +11,17 @@ produtos a clientes. Hoje a única vitrine é um Instagram simples.
 
 ## Escopo
 
-- **Catálogo público**: sem login, navegação por categoria, visual de
-  vitrine na identidade CMG3D. Cada produto mostra foto(s), nome,
-  descrição, tamanho e preço (preço pode ficar em branco).
+- **Catálogo público**: sem login, navegação por categoria (menu no
+  cabeçalho), busca por nome, visual de vitrine na identidade CMG3D.
+  Cada produto mostra foto(s), nome, descrição, tamanho e preço (preço
+  pode ficar em branco).
+- **Home com destaques**: banner/carrossel com os produtos marcados
+  como "destacar" no admin, e uma seção "Mais vistos" automática.
 - **Área admin**: login para duas pessoas (mesma permissão), cadastro,
-  edição e remoção de produtos e categorias.
+  edição e remoção de produtos e categorias, checkbox de destaque.
 - **Página de cores disponíveis**: lista geral, independente de produto.
+- Botão de contato via WhatsApp por produto (opcional, via variável de
+  ambiente).
 - Sem PDF, sem checkout, sem domínio próprio pago — link gratuito do Vercel.
 - Sem raspagem automática do MakerWorld (descartada — ver Status):
   cadastro de produtos é manual, pelo painel admin.
@@ -26,7 +31,8 @@ repositório [caiogavioli/Brainstorm](https://github.com/caiogavioli/Brainstorm)
 
 ## Stack
 
-- **Frontend**: Next.js (App Router, TypeScript, Tailwind CSS)
+- **Frontend**: Next.js (App Router, TypeScript, Tailwind CSS), Framer
+  Motion (animações), Lucide (ícones)
 - **Hospedagem**: Vercel (domínio gratuito `*.vercel.app`)
 - **Banco de dados + Auth + Storage**: Supabase (grátis no volume esperado)
 
@@ -55,7 +61,10 @@ arquivo do logo chegar.
 
 1. Criar um projeto novo (grátis) em [supabase.com](https://supabase.com).
 2. No **SQL Editor**, rodar o conteúdo de `supabase/schema.sql` — cria as
-   tabelas, as políticas de acesso e o bucket de storage `produtos`.
+   tabelas, as políticas de acesso e o bucket de storage `produtos`. Se o
+   projeto já existir (schema já foi rodado antes), rodar também os
+   arquivos `supabase/migration-*.sql` que ainda não tiverem sido
+   aplicados — cada um só precisa rodar uma vez.
 3. Em **Authentication → Users**, criar manualmente as duas contas admin
    (e-mail + senha). Não há tela de cadastro pública — só o painel do
    Supabase cria usuários.
@@ -66,7 +75,9 @@ arquivo do logo chegar.
 
 ```bash
 cp .env.example .env.local
-# preencher NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY
+# preencher NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY e,
+# opcionalmente, NEXT_PUBLIC_WHATSAPP_NUMBER (sem essa última o botão de
+# WhatsApp simplesmente não aparece)
 ```
 
 ### 3. Rodar localmente
@@ -81,15 +92,18 @@ npm run dev
 
 ### 4. Deploy
 
-Importar o repositório no Vercel, configurar as duas variáveis de ambiente
-acima no projeto Vercel, e usar o domínio gratuito `*.vercel.app`.
+Importar o repositório no Vercel, configurar as mesmas variáveis de
+ambiente no projeto Vercel, e usar o domínio gratuito `*.vercel.app`.
 
 ## Status
 
 Site (catálogo público + área admin) implementado com Next.js + Supabase e
-publicado no Vercel. Falta: confirmar que o schema e as contas admin foram
-criados no projeto Supabase real, configurar as variáveis de ambiente no
-Vercel, adicionar o logo da marca e cadastrar os produtos pelo painel admin.
+publicado no Vercel, incluindo destaques na home, "mais vistos", busca,
+ordenação/paginação, visualização rápida e contato via WhatsApp. Falta:
+confirmar que o schema, as migrações e as contas admin foram aplicados no
+projeto Supabase real, configurar as variáveis de ambiente no Vercel
+(incluindo `NEXT_PUBLIC_WHATSAPP_NUMBER`), adicionar o logo da marca e
+cadastrar os produtos pelo painel admin.
 
 A raspagem automática do MakerWorld, que estava no escopo original, foi
 **descartada**: o ambiente de implementação não tinha acesso de rede ao

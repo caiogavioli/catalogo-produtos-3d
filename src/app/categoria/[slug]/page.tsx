@@ -1,14 +1,36 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProductCard } from "@/components/product-card";
+import { Pagination } from "@/components/pagination";
+import { PAGE_SIZE, pageRange, parsePage } from "@/lib/pagination";
 import type { Product } from "@/types/catalog";
+
+const SORTS = {
+  recentes: { column: "created_at", ascending: false, label: "Mais recentes" },
+  preco_asc: { column: "price", ascending: true, label: "Menor preço" },
+  preco_desc: { column: "price", ascending: false, label: "Maior preço" },
+} as const;
+
+type SortKey = keyof typeof SORTS;
+
+function isSortKey(value: string | undefined): value is SortKey {
+  return !!value && value in SORTS;
+}
 
 export default async function CategoriaPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ sort?: string; page?: string }>;
 }) {
   const { slug } = await params;
+  const { sort: sortParam, page: pageParam } = await searchParams;
+  const sortKey: SortKey = isSortKey(sortParam) ? sortParam : "recentes";
+  const sort = SORTS[sortKey];
+  const page = parsePage(pageParam);
+
   const supabase = await createClient();
 
   const { data: category } = await supabase
@@ -19,28 +41,62 @@ export default async function CategoriaPage({
 
   if (!category) notFound();
 
-  const { data: products } = await supabase
+  const [from, to] = pageRange(page);
+  const { data: products, count } = await supabase
     .from("products")
-    .select("id, name, slug, description, size, price, category_id, created_at, images:product_images(id, product_id, url, position)")
+    .select(
+      "id, name, slug, description, size, price, category_id, featured, view_count, created_at, images:product_images(id, product_id, url, position)",
+      { count: "exact" },
+    )
     .eq("category_id", category.id)
-    .order("created_at", { ascending: false });
+    .order(sort.column, { ascending: sort.ascending })
+    .range(from, to);
 
   const items = (products ?? []) as Product[];
   for (const product of items) {
     product.images?.sort((a, b) => a.position - b.position);
   }
 
+  const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
+  const buildHref = (overrides: { sort?: SortKey; page?: number }) => {
+    const params = new URLSearchParams();
+    params.set("sort", overrides.sort ?? sortKey);
+    params.set("page", String(overrides.page ?? page));
+    return `/categoria/${slug}?${params.toString()}`;
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="mb-6 text-2xl font-bold text-ink-50">{category.name}</h1>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold text-ink-50">{category.name}</h1>
+        {items.length > 0 && (
+          <div className="flex gap-1 text-sm">
+            {(Object.keys(SORTS) as SortKey[]).map((key) => (
+              <Link
+                key={key}
+                href={buildHref({ sort: key, page: 1 })}
+                className={`rounded-full px-3 py-1 transition-colors ${
+                  key === sortKey ? "bg-brand-700 text-white" : "text-ink-400 hover:bg-ink-800 hover:text-ink-50"
+                }`}
+              >
+                {SORTS[key].label}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
       {items.length === 0 ? (
         <p className="text-ink-400">Nenhum produto nesta categoria ainda.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {items.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {items.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+          <Pagination page={page} totalPages={totalPages} buildHref={(p) => buildHref({ page: p })} />
+        </>
       )}
     </div>
   );

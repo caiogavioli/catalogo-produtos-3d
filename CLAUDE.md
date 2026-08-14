@@ -16,12 +16,25 @@ arquivo `projetos/catalogo-produtos-3d.md`.
 ## Escopo da v1
 
 Entra:
-- Catálogo público, sem login, navegação por categoria, visual "vitrine" na
-  identidade CMG3D (roxo/metálico, moderno). Produto mostra foto(s), nome,
-  descrição, tamanho e preço (opcional, pode ficar em branco).
+- Catálogo público, sem login, navegação por categoria (menu no
+  cabeçalho), visual "vitrine" na identidade CMG3D. Produto mostra
+  foto(s), nome, descrição, tamanho e preço (opcional, pode ficar em
+  branco).
 - Área admin com login para 2 usuários, mesma permissão total (CRUD de
-  produtos e categorias).
+  produtos e categorias), incluindo checkbox "destacar" por produto.
 - Página de cores disponíveis (lista geral, não é atributo por produto).
+- Busca por nome de produto (`/busca`), com paginação.
+- Página de categoria com ordenação (recentes/preço) e paginação —
+  necessário desde que o usuário avisou que o catálogo vai crescer pra
+  centenas de produtos (2026-08-14).
+- Home: banner/carrossel autoplay com os produtos marcados como
+  "destacar" no admin; seção "Mais vistos" automática, por contagem de
+  visualização (só aparece depois que algum produto tiver visualizações).
+- Badge "Novo" automático em produtos cadastrados nos últimos 14 dias.
+- "Visualização rápida" (modal) no card do produto, sem sair da listagem.
+- Botão "Perguntar no WhatsApp" na página do produto e na visualização
+  rápida — só aparece se `NEXT_PUBLIC_WHATSAPP_NUMBER` estiver
+  configurado.
 
 Não entra:
 - Geração de PDF (descontinuada).
@@ -37,10 +50,20 @@ Não entra:
 
 ## Stack
 
-- Frontend: Next.js.
+- Frontend: Next.js, Framer Motion (animações), Lucide (ícones).
 - Hospedagem: Vercel, domínio `*.vercel.app` gratuito.
 - Banco de dados + autenticação + storage de imagens: Supabase (camada
   gratuita).
+
+### Mudanças de schema depois do primeiro deploy
+
+`supabase/schema.sql` é a fonte da verdade pra um projeto Supabase novo,
+mas **não** atualiza um banco que já existe (`create table if not
+exists` não adiciona coluna em tabela já criada). Toda mudança de schema
+feita depois do primeiro deploy também precisa de um arquivo de
+migração separado em `supabase/` (ex.: `migration-destaques-busca.sql`)
+pro usuário rodar manualmente no SQL Editor do Supabase — não temos
+acesso automatizado ao banco de produção.
 
 ## Riscos conhecidos
 
