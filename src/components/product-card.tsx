@@ -12,6 +12,7 @@ import type { Product } from "@/types/catalog";
 export function ProductCard({ product }: { product: Product }) {
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const cover = product.images?.[0];
+  const secondPhoto = product.images?.[1];
 
   return (
     <>
@@ -26,13 +27,30 @@ export function ProductCard({ product }: { product: Product }) {
         >
           <div className="relative aspect-square bg-ink-950">
             {cover ? (
-              <Image
-                src={cover.url}
-                alt={product.name}
-                fill
-                sizes="(min-width: 768px) 25vw, 50vw"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
+              <>
+                <Image
+                  src={cover.url}
+                  alt={product.name}
+                  fill
+                  sizes="(min-width: 768px) 25vw, 50vw"
+                  className={`object-cover transition-opacity duration-300 ${
+                    secondPhoto ? "group-hover:opacity-0" : ""
+                  }`}
+                />
+                {/* Segunda foto por baixo, revelada no hover — troca de
+                    ângulo sem precisar entrar no produto. Sem 2ª foto,
+                    a primeira fica sozinha e não anima nada. */}
+                {secondPhoto && (
+                  <Image
+                    src={secondPhoto.url}
+                    alt=""
+                    aria-hidden
+                    fill
+                    sizes="(min-width: 768px) 25vw, 50vw"
+                    className="object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  />
+                )}
+              </>
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-ink-400">
                 Sem foto
