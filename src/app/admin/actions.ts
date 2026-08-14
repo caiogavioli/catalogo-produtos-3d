@@ -52,6 +52,25 @@ type ParsedProductForm = {
   colorIds: string[];
 };
 
+// Aceita tanto "1.234,56" (formato BR, vírgula decimal) quanto "45.90"
+// (alguém digitando ponto decimal sem perceber que o campo é BR) sem
+// interpretar o segundo caso como 4590 — antes disso já aconteceu de um
+// preço ficar 100x maior do que o digitado, sem nenhum aviso.
+function parseBrazilianOrPlainPrice(raw: string): number | null {
+  if (raw.includes(",")) {
+    const value = Number(raw.replace(/\./g, "").replace(",", "."));
+    return Number.isFinite(value) ? value : null;
+  }
+
+  const dotMatches = raw.match(/\./g) ?? [];
+  const lastDot = raw.lastIndexOf(".");
+  const decimalsAfterLastDot = lastDot === -1 ? 0 : raw.length - lastDot - 1;
+  const looksLikeDecimalPoint = dotMatches.length === 1 && decimalsAfterLastDot > 0 && decimalsAfterLastDot <= 2;
+
+  const value = Number(looksLikeDecimalPoint ? raw : raw.replace(/\./g, ""));
+  return Number.isFinite(value) ? value : null;
+}
+
 function parseProductForm(formData: FormData): { data: ParsedProductForm } | { error: string } {
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return { error: "Nome é obrigatório." };
@@ -66,10 +85,8 @@ function parseProductForm(formData: FormData): { data: ParsedProductForm } | { e
   const priceRaw = String(formData.get("price") ?? "").trim();
   let price: number | null = null;
   if (priceRaw) {
-    // aceita formato brasileiro (milhar com ponto, decimal com vírgula): "1.234,56"
-    const normalized = priceRaw.replace(/\./g, "").replace(",", ".");
-    price = Number(normalized);
-    if (!Number.isFinite(price)) return { error: "Preço inválido." };
+    price = parseBrazilianOrPlainPrice(priceRaw);
+    if (price === null) return { error: "Preço inválido." };
   }
 
   return { data: { name, description, size, price, categoryId, featured, colorMode, colorIds } };
@@ -177,7 +194,15 @@ export async function createProduct(_prevState: ActionState, formData: FormData)
     const files = formData.getAll("photos") as File[];
     await uploadProductImages(product.id, files);
   } catch (uploadError) {
-    return { error: uploadError instanceof Error ? uploadError.message : "Falha ao salvar o produto." };
+    // Sem isso, uma falha no upload (ex.: nome de arquivo que quebra o
+    // caminho no storage) deixava o produto "fantasma" já salvo no banco,
+    // sem foto e sem indicação clara pro usuário do que aconteceu.
+    await supabase.from("products").delete().eq("id", product.id);
+    return {
+      error:
+        (uploadError instanceof Error ? uploadError.message : "Falha ao salvar o produto.") +
+        " O produto não foi criado — tente de novo.",
+    };
   }
 
   revalidatePath("/");

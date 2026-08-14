@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProductCard } from "@/components/product-card";
 import { Pagination } from "@/components/pagination";
@@ -42,29 +42,39 @@ export default async function CategoriaPage({
 
   if (!category) notFound();
 
-  const [from, to] = pageRange(page);
-  const { data: products, count } = await supabase
-    .from("products")
-    .select(
-      "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))",
-      { count: "exact" },
-    )
-    .eq("category_id", category.id)
-    .order(sort.column, { ascending: sort.ascending })
-    .range(from, to);
-
-  const items = (products ?? []).map(flattenProductColors) as Product[];
-  for (const product of items) {
-    product.images?.sort((a, b) => a.position - b.position);
-  }
-
-  const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
   const buildHref = (overrides: { sort?: SortKey; page?: number }) => {
     const params = new URLSearchParams();
     params.set("sort", overrides.sort ?? sortKey);
     params.set("page", String(overrides.page ?? page));
     return `/categoria/${slug}?${params.toString()}`;
   };
+
+  // Precisa saber o total antes de decidir se `page` é válida — por isso
+  // uma segunda contagem rápida (sem trazer as linhas) antes da busca real.
+  const { count: totalCount } = await supabase
+    .from("products")
+    .select("id", { count: "exact", head: true })
+    .eq("category_id", category.id);
+  const totalPages = Math.max(1, Math.ceil((totalCount ?? 0) / PAGE_SIZE));
+  if (page > totalPages) redirect(buildHref({ page: totalPages }));
+
+  const [from, to] = pageRange(page);
+  const { data: products } = await supabase
+    .from("products")
+    .select(
+      "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))",
+    )
+    .eq("category_id", category.id)
+    // "Sob consulta" (preço em branco) sempre por último, nas duas direções
+    // de ordenação por preço — sem isso o Postgres põe nulo primeiro no
+    // "Maior preço", na frente dos produtos mais caros de verdade.
+    .order(sort.column, { ascending: sort.ascending, nullsFirst: false })
+    .range(from, to);
+
+  const items = (products ?? []).map(flattenProductColors) as Product[];
+  for (const product of items) {
+    product.images?.sort((a, b) => a.position - b.position);
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">

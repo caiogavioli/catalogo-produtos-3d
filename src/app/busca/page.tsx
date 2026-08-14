@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProductCard } from "@/components/product-card";
 import { Pagination } from "@/components/pagination";
@@ -23,13 +24,21 @@ export default async function BuscaPage({
   }
 
   const supabase = await createClient();
-  const [from, to] = pageRange(page);
 
-  const { data: products, count } = await supabase
+  const { count: totalCount } = await supabase
+    .from("products")
+    .select("id", { count: "exact", head: true })
+    .ilike("name", `%${query}%`);
+  const totalPages = Math.max(1, Math.ceil((totalCount ?? 0) / PAGE_SIZE));
+  if (page > totalPages) {
+    redirect(`/busca?q=${encodeURIComponent(query)}&page=${totalPages}`);
+  }
+
+  const [from, to] = pageRange(page);
+  const { data: products } = await supabase
     .from("products")
     .select(
       "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))",
-      { count: "exact" },
     )
     .ilike("name", `%${query}%`)
     .order("created_at", { ascending: false })
@@ -39,8 +48,6 @@ export default async function BuscaPage({
   for (const product of items) {
     product.images?.sort((a, b) => a.position - b.position);
   }
-
-  const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">

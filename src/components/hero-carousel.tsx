@@ -25,7 +25,10 @@ export function HeroCarousel({ products }: { products: Product[] }) {
 
   if (products.length === 0) return null;
 
-  const product = products[index];
+  // A lista pode encolher entre renders (revalidação depois que o admin
+  // desmarca "destacar" de um produto em outra aba) — sem esse guard,
+  // `index` podia ficar apontando pra fora do array por um instante.
+  const product = products[index] ?? products[0];
   const cover = product.images?.[0];
 
   return (
