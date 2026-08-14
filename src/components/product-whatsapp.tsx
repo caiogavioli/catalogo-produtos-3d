@@ -27,7 +27,7 @@ export function ProductWhatsapp({
       {showColors && (
         <div>
           <p className="text-sm font-medium text-ink-200">Cores disponíveis</p>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Cores disponíveis">
             {colors.map((color) => (
               <button
                 key={color.id}
@@ -35,8 +35,9 @@ export function ProductWhatsapp({
                 onClick={() => setSelectedColor(color)}
                 title={color.name}
                 aria-label={color.name}
-                aria-pressed={selectedColor?.id === color.id}
-                className={`h-8 w-8 rounded-full ring-2 transition-shadow ${
+                role="radio"
+                aria-checked={selectedColor?.id === color.id}
+                className={`h-8 w-8 rounded-full ring-2 transition-shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200 ${
                   selectedColor?.id === color.id ? "ring-brand-500" : "ring-ink-800 hover:ring-ink-200"
                 }`}
                 style={colorSwatchStyle(color)}

@@ -5,9 +5,21 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/slug";
 
-export type ActionState = { error?: string } | undefined;
+export type ActionState = { error?: string; success?: boolean } | undefined;
 
 const STORAGE_BUCKET = "produtos";
+
+// Segunda camada de checagem: o middleware e o layout já bloqueiam acesso
+// não autenticado às rotas do admin, mas cada Server Action de escrita
+// também confirma a sessão por conta própria — não depende só da RLS.
+async function requireAdmin() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Não autenticado.");
+  return supabase;
+}
 
 export async function login(_prevState: ActionState, formData: FormData): Promise<ActionState> {
   const email = String(formData.get("email") ?? "");
@@ -119,7 +131,7 @@ export async function createProduct(_prevState: ActionState, formData: FormData)
   if ("error" in parsed) return { error: parsed.error };
   const { name, description, size, price, categoryId, featured, colorMode, colorIds } = parsed.data;
 
-  const supabase = await createClient();
+  const supabase = await requireAdmin();
   const { data: product, error } = await supabase
     .from("products")
     .insert({
@@ -161,7 +173,7 @@ export async function updateProduct(
   if ("error" in parsed) return { error: parsed.error };
   const { name, description, size, price, categoryId, featured, colorMode, colorIds } = parsed.data;
 
-  const supabase = await createClient();
+  const supabase = await requireAdmin();
   const { error } = await supabase
     .from("products")
     .update({
@@ -192,10 +204,13 @@ export async function updateProduct(
 }
 
 export async function deleteProductImage(imageId: string) {
-  const supabase = await createClient();
+  const supabase = await requireAdmin();
   const { data: image } = await supabase.from("product_images").select("url").eq("id", imageId).single();
 
-  await supabase.from("product_images").delete().eq("id", imageId);
+  const { error } = await supabase.from("product_images").delete().eq("id", imageId);
+  if (error) throw new Error(error.message);
+  // Remove o arquivo do storage só depois de confirmar que a linha saiu do
+  // banco — evita órfão no storage se a linha nem existia mais.
   if (image) await removeStorageFiles([image.url]);
 
   revalidatePath("/admin");
@@ -203,10 +218,11 @@ export async function deleteProductImage(imageId: string) {
 }
 
 export async function deleteProduct(id: string) {
-  const supabase = await createClient();
+  const supabase = await requireAdmin();
   const { data: images } = await supabase.from("product_images").select("url").eq("product_id", id);
 
-  await supabase.from("products").delete().eq("id", id);
+  const { error } = await supabase.from("products").delete().eq("id", id);
+  if (error) throw new Error(error.message);
   if (images && images.length > 0) await removeStorageFiles(images.map((image) => image.url));
 
   revalidatePath("/");
@@ -217,17 +233,19 @@ export async function createCategory(_prevState: ActionState, formData: FormData
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return { error: "Nome é obrigatório." };
 
-  const supabase = await createClient();
+  const supabase = await requireAdmin();
   const { error } = await supabase.from("categories").insert({ name, slug: slugify(name) });
   if (error) return { error: error.message };
 
   revalidatePath("/admin/categorias");
   revalidatePath("/");
+  return { success: true };
 }
 
 export async function deleteCategory(id: string) {
-  const supabase = await createClient();
-  await supabase.from("categories").delete().eq("id", id);
+  const supabase = await requireAdmin();
+  const { error } = await supabase.from("categories").delete().eq("id", id);
+  if (error) throw new Error(error.message);
   revalidatePath("/admin/categorias");
   revalidatePath("/");
 }
@@ -238,17 +256,19 @@ export async function createColor(_prevState: ActionState, formData: FormData): 
   const hex = String(formData.get("hex") ?? "").trim() || null;
   const metallic = formData.get("metallic") === "on";
 
-  const supabase = await createClient();
+  const supabase = await requireAdmin();
   const { error } = await supabase.from("colors").insert({ name, hex, metallic });
   if (error) return { error: error.message };
 
   revalidatePath("/admin/cores");
   revalidatePath("/admin/produtos/novo");
+  return { success: true };
 }
 
 export async function deleteColor(id: string) {
-  const supabase = await createClient();
-  await supabase.from("colors").delete().eq("id", id);
+  const supabase = await requireAdmin();
+  const { error } = await supabase.from("colors").delete().eq("id", id);
+  if (error) throw new Error(error.message);
   revalidatePath("/admin/cores");
   revalidatePath("/admin/produtos/novo");
 }

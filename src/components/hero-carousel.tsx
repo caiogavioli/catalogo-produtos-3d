@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import type { Product } from "@/types/catalog";
@@ -13,14 +13,15 @@ const AUTOPLAY_MS = 5000;
 export function HeroCarousel({ products }: { products: Product[] }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    if (paused || products.length < 2) return;
+    if (paused || reduceMotion || products.length < 2) return;
     const timer = setInterval(() => {
       setIndex((current) => (current + 1) % products.length);
     }, AUTOPLAY_MS);
     return () => clearInterval(timer);
-  }, [paused, products.length]);
+  }, [paused, reduceMotion, products.length]);
 
   if (products.length === 0) return null;
 
@@ -32,6 +33,8 @@ export function HeroCarousel({ products }: { products: Product[] }) {
       className="glass-card relative mx-auto mt-6 aspect-[21/9] max-w-5xl overflow-hidden rounded-xl sm:aspect-[3/1]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
     >
       <AnimatePresence mode="wait">
         <motion.div

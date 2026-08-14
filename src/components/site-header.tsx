@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Box, ChevronDown, Menu, Search, X } from "lucide-react";
@@ -29,6 +29,15 @@ function SearchForm({ onSubmitted, className }: { onSubmitted?: () => void; clas
 function CategoriasMenu({ categories }: { categories: Category[] }) {
   const [aberto, setAberto] = useState(false);
 
+  useEffect(() => {
+    if (!aberto) return;
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setAberto(false);
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [aberto]);
+
   if (categories.length === 0) return null;
 
   return (
@@ -38,6 +47,7 @@ function CategoriasMenu({ categories }: { categories: Category[] }) {
         onClick={() => setAberto((open) => !open)}
         className="flex items-center gap-1 transition-colors hover:text-brand-200"
         aria-expanded={aberto}
+        aria-controls="categorias-menu-painel"
       >
         Categorias
         <ChevronDown className={`h-4 w-4 transition-transform ${aberto ? "rotate-180" : ""}`} />
@@ -49,6 +59,7 @@ function CategoriasMenu({ categories }: { categories: Category[] }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
+            id="categorias-menu-painel"
             className="glass-card absolute right-0 top-full mt-2 w-48 overflow-hidden rounded-lg p-1"
           >
             {categories.map((category) => (

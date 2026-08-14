@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -12,6 +13,24 @@ import type { Product } from "@/types/catalog";
 // buscar nada de novo no banco só para abrir a prévia.
 export function QuickViewModal({ product, onClose }: { product: Product; onClose: () => void }) {
   const cover = product.images?.[0];
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = `quick-view-title-${product.id}`;
+
+  useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    dialogRef.current?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <AnimatePresence>
@@ -23,12 +42,17 @@ export function QuickViewModal({ product, onClose }: { product: Product; onClose
         onClick={onClose}
       >
         <motion.div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          tabIndex={-1}
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.96 }}
           transition={{ duration: 0.15 }}
           onClick={(event) => event.stopPropagation()}
-          className="glass-card grid w-full max-w-2xl gap-6 overflow-hidden rounded-xl p-5 sm:grid-cols-2"
+          className="glass-card grid w-full max-w-2xl gap-6 overflow-hidden rounded-xl p-5 outline-none sm:grid-cols-2"
         >
           <button
             type="button"
@@ -57,7 +81,7 @@ export function QuickViewModal({ product, onClose }: { product: Product; onClose
               <X className="h-5 w-5" />
             </button>
 
-            <h2 className="pr-8 text-xl font-bold text-ink-50">{product.name}</h2>
+            <h2 id={titleId} className="pr-8 text-xl font-bold text-ink-50">{product.name}</h2>
             <p className="mt-1 text-lg text-brand-500">{formatPrice(product.price)}</p>
 
             {product.size && (

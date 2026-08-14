@@ -13,7 +13,11 @@ export default async function HomePage() {
     supabase
       .from("products")
       .select("id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))")
-      .order("created_at", { ascending: false }),
+      .order("created_at", { ascending: false })
+      // A home só mostra uma amostra por seção (destaques, mais vistos, até
+      // 4 por categoria) — limitar a busca evita baixar o catálogo inteiro
+      // (que deve crescer para centenas de produtos) a cada carregamento.
+      .limit(120),
   ]);
 
   const allProducts = (products ?? []).map(flattenProductColors) as Product[];
