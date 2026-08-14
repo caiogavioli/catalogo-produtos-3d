@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { deleteProductImage, type ActionState } from "@/app/admin/actions";
 import { colorSwatchStyle } from "@/lib/colors";
+import { PhotoSlots } from "@/components/admin/photo-slots";
 import type { Category, Color, Product } from "@/types/catalog";
 
 export function ProductForm({
@@ -204,19 +205,7 @@ export function ProductForm({
         </div>
       )}
 
-      <div>
-        <label htmlFor="photos" className="block text-sm font-medium text-ink-200">
-          {product ? "Adicionar fotos" : "Fotos"}
-        </label>
-        <input
-          id="photos"
-          name="photos"
-          type="file"
-          accept="image/*"
-          multiple
-          className="mt-1 w-full text-sm"
-        />
-      </div>
+      <PhotoSlots existingCount={product?.images?.length ?? 0} />
 
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
 
