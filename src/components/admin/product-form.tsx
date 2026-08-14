@@ -19,8 +19,10 @@ export function ProductForm({
   const [state, formAction, pending] = useActionState(action, undefined);
   const [colorMode, setColorMode] = useState<"unica" | "varias">(product?.color_mode ?? "unica");
   const selectedColorIds = new Set(product?.colors?.map((color) => color.id) ?? []);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
   return (
+    <>
     <form action={formAction} className="max-w-xl space-y-4">
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-ink-200">
@@ -171,9 +173,16 @@ export function ProductForm({
           <p className="block text-sm font-medium text-ink-200">Fotos atuais</p>
           <div className="mt-2 grid grid-cols-4 gap-2">
             {product.images.map((image) => (
-              <div key={image.id} className="group relative aspect-square">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={image.url} alt="" className="h-full w-full rounded object-cover" />
+              <div key={image.id} className="relative aspect-square">
+                <button
+                  type="button"
+                  onClick={() => setZoomedImage(image.url)}
+                  title="Ampliar foto"
+                  className="block h-full w-full"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={image.url} alt="" className="h-full w-full rounded object-cover" />
+                </button>
                 <form
                   action={deleteProductImage.bind(null, image.id)}
                   onSubmit={(event) => {
@@ -183,7 +192,8 @@ export function ProductForm({
                   <button
                     type="submit"
                     title="Remover foto"
-                    className="absolute right-1 top-1 rounded-full bg-black/60 px-1.5 text-xs text-white opacity-0 group-hover:opacity-100"
+                    aria-label="Remover foto"
+                    className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-sm text-white hover:bg-black/90"
                   >
                     ×
                   </button>
@@ -218,5 +228,32 @@ export function ProductForm({
         {pending ? "Salvando..." : "Salvar"}
       </button>
     </form>
+
+    {zoomedImage && (
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Foto ampliada"
+        onClick={() => setZoomedImage(null)}
+        className="fixed inset-0 z-40 flex items-center justify-center bg-ink-950/90 p-4"
+      >
+        <button
+          type="button"
+          onClick={() => setZoomedImage(null)}
+          aria-label="Fechar"
+          className="absolute right-4 top-4 rounded-full bg-black/60 px-3 py-1.5 text-lg text-white hover:bg-black/80"
+        >
+          ×
+        </button>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={zoomedImage}
+          alt=""
+          onClick={(event) => event.stopPropagation()}
+          className="max-h-full max-w-full rounded object-contain"
+        />
+      </div>
+    )}
+    </>
   );
 }
