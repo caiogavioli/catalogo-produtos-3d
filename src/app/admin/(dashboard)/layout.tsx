@@ -1,7 +1,19 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { logout } from "../actions";
+import { createClient } from "@/lib/supabase/server";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+// Segunda camada de proteção além do middleware: se por qualquer motivo
+// o middleware não rodar (ex.: mudança de plataforma, bug de infra),
+// essa página não confia só nele — confere a sessão de novo aqui.
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/admin/login");
+
   return (
     <div>
       <div className="glass-card border-x-0 border-t-0">
