@@ -77,6 +77,14 @@ Editor do Supabase — não temos acesso automatizado ao banco de produção.
 
 - Camadas gratuitas (Vercel/Supabase) têm limites de uso — improvável de
   estourar no volume esperado, mas vale monitorar se crescer muito.
+- Supabase gratuito **pausa o projeto sozinho depois de 7 dias sem
+  atividade** — já causou um 504 `MIDDLEWARE_INVOCATION_TIMEOUT` real no
+  `/admin` (2026-08-14), porque o middleware chama `auth.getUser()` a
+  cada request e trava esperando um projeto pausado responder. Corrigido
+  com um cron do Vercel (`vercel.json`) chamando `/api/keep-alive` 1x por
+  dia — se o erro voltar a aparecer, checar primeiro se o cron está
+  rodando (aba Cron Jobs no dashboard do Vercel) antes de investigar
+  outra causa.
 - Autenticação e hospedagem são peças que podem falhar — mais superfície de
   manutenção que um script local.
 - Cadastro de produtos é 100% manual pelo painel admin (sem raspagem) —
