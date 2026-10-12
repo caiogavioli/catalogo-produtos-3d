@@ -31,6 +31,11 @@ Entra:
   Cor pode ser marcada como "metálica" no admin — o círculo ganha um
   brilho (gradiente claro/escuro sobre a cor base, `colorSwatchStyle`
   em `src/lib/colors.ts`) em vez de ficar lisa.
+- Página admin `/admin/escolha`: dono e esposa marcam "Quero"/"Talvez"
+  nos ~6,7 mil modelos do MakerWorld (lista estática em
+  `public/dados/modelos-makerworld.json`) pra montar a seção "Sob
+  encomenda". Marcações por usuário na tabela `model_picks`
+  (`supabase/migration-escolha-modelos.sql`, já rodada em produção).
 - Busca por nome de produto (`/busca`), com paginação.
 - Página de categoria com ordenação (recentes/preço) e paginação —
   necessário desde que o usuário avisou que o catálogo vai crescer pra
