@@ -13,3 +13,4 @@ venv/
 
 # dados locais
 data/fotos/
+*.tsbuildinfo
