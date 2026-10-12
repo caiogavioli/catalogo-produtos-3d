@@ -19,7 +19,12 @@ export function ProductForm({
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
   const [colorMode, setColorMode] = useState<"unica" | "varias">(product?.color_mode ?? "unica");
-  const selectedColorIds = new Set(product?.colors?.map((color) => color.id) ?? []);
+  // Cores marcadas. Ao escolher "Várias cores" sem nenhuma marcada, marca
+  // todas de uma vez (dá pra desmarcar as que não servem).
+  const [selectedColorIds, setSelectedColorIds] = useState<Set<string>>(
+    () => new Set(product?.colors?.map((color) => color.id) ?? []),
+  );
+  const marcarTodas = () => setSelectedColorIds(new Set(colors.map((color) => color.id)));
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
   return (
@@ -118,7 +123,10 @@ export function ProductForm({
               name="color_mode"
               value="varias"
               checked={colorMode === "varias"}
-              onChange={() => setColorMode("varias")}
+              onChange={() => {
+                setColorMode("varias");
+                if (selectedColorIds.size === 0) marcarTodas();
+              }}
               className="accent-brand-700"
             />
             Várias cores
@@ -136,6 +144,15 @@ export function ProductForm({
                 .
               </p>
             ) : (
+              <>
+              <div className="mb-2 flex gap-4 text-xs">
+                <button type="button" onClick={marcarTodas} className="text-brand-500 hover:underline">
+                  Marcar todas
+                </button>
+                <button type="button" onClick={() => setSelectedColorIds(new Set())} className="text-brand-500 hover:underline">
+                  Desmarcar todas
+                </button>
+              </div>
               <div className="flex flex-wrap gap-3">
                 {colors.map((color) => (
                   <label
@@ -146,7 +163,15 @@ export function ProductForm({
                       type="checkbox"
                       name="color_ids"
                       value={color.id}
-                      defaultChecked={selectedColorIds.has(color.id)}
+                      checked={selectedColorIds.has(color.id)}
+                      onChange={(e) =>
+                        setSelectedColorIds((atual) => {
+                          const novo = new Set(atual);
+                          if (e.target.checked) novo.add(color.id);
+                          else novo.delete(color.id);
+                          return novo;
+                        })
+                      }
                       className="accent-brand-700"
                     />
                     <span className="h-4 w-4 rounded-full ring-1 ring-ink-800" style={colorSwatchStyle(color)} />
@@ -154,6 +179,7 @@ export function ProductForm({
                   </label>
                 ))}
               </div>
+              </>
             )}
           </div>
         )}

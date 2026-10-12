@@ -19,11 +19,11 @@ export function ProductCard({ product }: { product: Product }) {
       <motion.div
         whileHover={{ y: -4 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="group relative"
+        className="group relative h-full"
       >
         <Link
           href={`/produto/${product.slug}`}
-          className="glass-card block overflow-hidden rounded-lg transition-shadow hover:shadow-lg hover:shadow-brand-700/10"
+          className="glass-card flex h-full flex-col overflow-hidden rounded-lg transition-shadow hover:shadow-lg hover:shadow-brand-700/10"
         >
           <div className="relative aspect-square bg-ink-950">
             {cover ? (
@@ -63,9 +63,11 @@ export function ProductCard({ product }: { product: Product }) {
               </span>
             )}
           </div>
-          <div className="p-3">
-            <h3 className="font-semibold text-ink-50">{product.name}</h3>
-            <p className="font-mono text-sm text-brand-500">{formatPrice(product.price)}</p>
+          <div className="flex flex-1 flex-col p-3">
+            {/* Título limitado a 2 linhas e com altura mínima: cards lado a
+                lado ficam do mesmo tamanho e o preço alinha embaixo. */}
+            <h3 className="line-clamp-2 min-h-[2.75rem] font-semibold leading-snug text-ink-50">{product.name}</h3>
+            <p className="mt-auto pt-1 font-mono text-sm text-brand-500">{formatPrice(product.price)}</p>
           </div>
         </Link>
 
