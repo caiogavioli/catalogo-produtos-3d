@@ -250,6 +250,43 @@ export async function updateProduct(
   redirect("/admin");
 }
 
+export type QuickProductPatch = {
+  category_id?: string | null;
+  featured?: boolean;
+  color_mode?: "unica" | "varias";
+  price?: string | null;
+};
+
+// Edição rápida direto na lista de produtos: cada dropdown/campo salva só
+// o que mudou, sem abrir o formulário completo. Trocar pra "cor única" não
+// apaga as cores escolhidas (voltar pra "várias" recupera a seleção).
+export async function quickUpdateProduct(id: string, patch: QuickProductPatch): Promise<{ error?: string }> {
+  const supabase = await requireAdmin();
+  const update: Record<string, unknown> = {};
+
+  if ("category_id" in patch) update.category_id = patch.category_id || null;
+  if ("featured" in patch) update.featured = Boolean(patch.featured);
+  if ("color_mode" in patch) update.color_mode = patch.color_mode === "varias" ? "varias" : "unica";
+  if ("price" in patch) {
+    const raw = (patch.price ?? "").trim();
+    if (!raw) {
+      update.price = null;
+    } else {
+      const value = parseBrazilianOrPlainPrice(raw);
+      if (value === null) return { error: "Preço inválido." };
+      update.price = value;
+    }
+  }
+  if (Object.keys(update).length === 0) return {};
+
+  const { error } = await supabase.from("products").update(update).eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/");
+  revalidatePath("/categoria", "layout");
+  return {};
+}
+
 export async function deleteProductImage(imageId: string) {
   const supabase = await requireAdmin();
   const { data: image } = await supabase.from("product_images").select("url").eq("id", imageId).single();
