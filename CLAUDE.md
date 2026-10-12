@@ -45,6 +45,17 @@ Entra:
   rascunho só se ele não foi editado. Schema em
   `supabase/migration-rascunhos-makerworld.sql` (rodar ANTES do deploy:
   as consultas públicas filtram `published`).
+- Página admin `/admin/gestao`: sistema de gestão do negócio (portado do
+  artefato "CMG Gestão" em 2026-10-12), com abas Pedidos (com fila de
+  impressão por impressora), Estoque de filamento, Preços (calculadora
+  de custo/preço por Pix, débito e crédito), Clientes, Painel de vendas
+  e Ajustes. Dados nas tabelas `gestao_*`
+  (`supabase/migration-gestao.sql`, só os 2 admins acessam). Ligado ao
+  catálogo: pedido e peça calculada podem apontar pra um produto do
+  site (`product_id`), e a calculadora tem o botão "Usar no site" que
+  grava o preço Pix no produto. Os números iniciais de Ajustes
+  (impressoras, DAS, taxas) são **exemplos** até o dono trocar pelos
+  reais. Código em `src/components/gestao/` e `src/lib/gestao.ts`.
 - Busca por nome de produto (`/busca`), com paginação.
 - Página de categoria com ordenação (recentes/preço) e paginação —
   necessário desde que o usuário avisou que o catálogo vai crescer pra
