@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { HeroCarousel } from "@/components/hero-carousel";
 import { ProductCard } from "@/components/product-card";
 import { flattenProductColors } from "@/lib/colors";
 import { formatPrice } from "@/lib/format";
@@ -47,11 +48,10 @@ export default async function HomePage() {
   const categoriasComProduto = categoriesList.filter((category) => (countByCategory.get(category.id) ?? 0) > 0);
 
   const featured = allProducts.filter((product) => product.featured);
-  // O destaque do topo é o primeiro produto marcado como "destacar" (ou o
-  // mais recente, se nenhum estiver marcado). A faixa de "Escolha a sua"
+  // O carrossel do topo mostra os produtos marcados como "destacar" (ou os 5
+  // mais recentes, se nenhum estiver marcado). A faixa de "Escolha a sua"
   // lista os destacados primeiro e completa com os mais recentes.
-  const spotlight = featured[0] ?? allProducts[0];
-  const spotlightCover = spotlight.images?.[0];
+  const banners = featured.length > 0 ? featured : allProducts.slice(0, 5);
   const strip = [...featured, ...allProducts.filter((product) => !product.featured)].slice(0, 10);
   const maisVistos = allProducts
     .filter((product) => product.view_count > 0)
@@ -61,61 +61,9 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Topo: texto à esquerda, peça em destaque num disco à direita */}
-      <section className="relative overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-32 -top-24 h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle,rgba(167,139,250,0.5),rgba(124,58,237,0.22)_45%,transparent_70%)] md:h-[760px] md:w-[760px]"
-        />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-10 md:grid-cols-[1.1fr_0.9fr] md:pb-24 md:pt-16">
-          <div>
-            <h1 className="text-5xl font-bold leading-[0.98] text-ink-50 md:text-7xl">
-              Peças impressas em 3D, <span className="text-brand-300">feitas para a sua casa.</span>
-            </h1>
-            <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-200">
-              Imagens sacras, decoração e peças personalizadas, feitas em São Paulo.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-5">
-              <Link
-                href="#catalogo"
-                className="rounded-[14px] bg-brand-700 px-6 py-3.5 font-semibold text-white transition-colors hover:bg-brand-800"
-              >
-                Ver catálogo
-              </Link>
-              {whatsapp && (
-                <a
-                  href={whatsapp}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border-b-2 border-brand-300 pb-0.5 font-semibold text-ink-50"
-                >
-                  Pedir no WhatsApp
-                </a>
-              )}
-            </div>
-          </div>
-
-          <Link href={`/produto/${spotlight.slug}`} className="group relative mx-auto block w-full max-w-[420px] md:max-w-[480px]">
-            <div className="relative aspect-square overflow-hidden rounded-full border-[10px] border-white/10 bg-black shadow-[0_50px_100px_-30px_rgba(0,0,0,0.6)]">
-              {spotlightCover ? (
-                <Image
-                  src={spotlightCover.url}
-                  alt={spotlight.name}
-                  fill
-                  priority
-                  sizes="(min-width: 768px) 480px, 90vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-ink-400">Sem foto</div>
-              )}
-            </div>
-            <div className="absolute -right-2 bottom-8 rounded-[20px] bg-ink-50 px-5 py-4 text-ink-950 shadow-[0_20px_40px_-16px_rgba(0,0,0,0.5)] md:-right-4">
-              <b className="block font-[family-name:var(--font-heading)] text-lg">{spotlight.name}</b>
-              <span className="mt-1 block font-mono text-xl font-semibold text-brand-900">{formatPrice(spotlight.price)}</span>
-            </div>
-          </Link>
-        </div>
+      {/* Topo: só o carrossel de destaques */}
+      <section className="mx-auto max-w-6xl px-4 pb-14 pt-6 md:pb-20 md:pt-8">
+        <HeroCarousel products={banners} />
       </section>
 
       {/* Parte clara: faixa de produtos, categorias, mais vistos e contato */}

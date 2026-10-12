@@ -126,11 +126,15 @@ escolheu a "opção C" entre três propostas de redesign — **v5 (atual)**:
 - **Fontes:** Space Grotesk nos títulos (`h1`-`h3`, variável
   `--font-heading`, tracking apertado) e Geist no corpo. Não usa mais
   Inter.
-- **Home:** texto à esquerda + peça em destaque num disco à direita
-  (primeiro produto marcado "destacar", senão o mais recente), faixa
-  horizontal "Escolha a sua", categorias em linhas grandes, "Mais vistos"
-  (automático) e bloco de contato por WhatsApp. O carrossel autoplay
-  (`hero-carousel.tsx`) saiu da home; o componente ficou no repo sem uso.
+- **Home:** topo é **só o carrossel** autoplay (`hero-carousel.tsx`) com
+  os produtos marcados "destacar" (ou os 5 mais recentes, se nenhum);
+  o usuário não gostou do topo com texto + disco (2026-10-12). Abaixo,
+  faixa horizontal "Escolha a sua", categorias em linhas grandes, "Mais
+  vistos" (automático) e bloco de contato por WhatsApp.
+- **Cards de produto:** título limitado a 2 linhas com altura mínima,
+  pra cards lado a lado terem o mesmo tamanho.
+- **Várias cores:** ao escolher "Várias cores" num produto sem cor
+  nenhuma, todas as cores cadastradas já vêm marcadas (form e lista).
 - Preço continua em fonte monoespaçada (`font-mono`); ícones Lucide.
 - Páginas internas (categoria, produto, busca, admin) herdam só as cores
   e fontes novas; o layout delas não foi redesenhado.

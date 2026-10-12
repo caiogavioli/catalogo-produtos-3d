@@ -284,6 +284,20 @@ export async function quickUpdateProduct(id: string, patch: QuickProductPatch): 
   const { error } = await supabase.from("products").update(update).eq("id", id);
   if (error) return { error: error.message };
 
+  // "Várias cores" num produto sem cor nenhuma: já marca todas as cadastradas.
+  if (update.color_mode === "varias") {
+    const { count } = await supabase
+      .from("product_colors")
+      .select("color_id", { count: "exact", head: true })
+      .eq("product_id", id);
+    if (!count) {
+      const { data: todas } = await supabase.from("colors").select("id");
+      if (todas?.length) {
+        await supabase.from("product_colors").insert(todas.map((c) => ({ product_id: id, color_id: c.id })));
+      }
+    }
+  }
+
   revalidatePath("/");
   revalidatePath("/categoria", "layout");
   revalidatePath("/busca");
