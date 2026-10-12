@@ -28,6 +28,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Link href="/admin/cores" className="hover:text-brand-500">
               Cores
             </Link>
+            <Link href="/admin/escolha" className="hover:text-brand-500">
+              Escolha
+            </Link>
           </nav>
           <form action={logout}>
             <button type="submit" className="text-sm text-ink-400 hover:text-ink-50">
