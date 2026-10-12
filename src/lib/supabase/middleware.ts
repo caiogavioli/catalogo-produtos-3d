@@ -31,8 +31,10 @@ export async function updateSession(request: NextRequest) {
 
   const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
   const isLoginRoute = request.nextUrl.pathname === "/admin/login";
+  // Telas que quem esqueceu a senha precisa abrir sem estar logado.
+  const isPublicAdminRoute = isLoginRoute || request.nextUrl.pathname === "/admin/esqueci-senha";
 
-  if (isAdminRoute && !isLoginRoute && !user) {
+  if (isAdminRoute && !isPublicAdminRoute && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
     return redirectWithSessionCookies(url, response);

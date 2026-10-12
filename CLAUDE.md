@@ -31,6 +31,10 @@ Entra:
   Cor pode ser marcada como "metálica" no admin — o círculo ganha um
   brilho (gradiente claro/escuro sobre a cor base, `colorSwatchStyle`
   em `src/lib/colors.ts`) em vez de ficar lisa.
+- Login do admin com "Esqueci minha senha" (`/admin/esqueci-senha` →
+  e-mail do Supabase → `/auth/callback` → `/admin/redefinir-senha`).
+  Exige o endereço do site na lista "Redirect URLs" do Supabase
+  (Authentication > URL Configuration).
 - Página admin `/admin/escolha`: dono e esposa marcam "Quero"/"Talvez"
   nos ~6,7 mil modelos do MakerWorld (lista estática em
   `public/dados/modelos-makerworld.json`) pra montar a seção "Sob
@@ -109,7 +113,10 @@ Editor do Supabase — não temos acesso automatizado ao banco de produção.
   com um cron do Vercel (`vercel.json`) chamando `/api/keep-alive` 1x por
   dia — se o erro voltar a aparecer, checar primeiro se o cron está
   rodando (aba Cron Jobs no dashboard do Vercel) antes de investigar
-  outra causa.
+  outra causa. Reserva: `.github/workflows/keep-alive.yml` chama a mesma
+  rota 1x por dia pelo GitHub Actions (usa a variável `SITE_URL` do
+  repositório; o GitHub desliga workflows agendados após 60 dias sem
+  atividade no repo).
 - Autenticação e hospedagem são peças que podem falhar — mais superfície de
   manutenção que um script local.
 - Cadastro de produtos é 100% manual pelo painel admin (sem raspagem) —
