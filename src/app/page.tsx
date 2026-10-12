@@ -1,8 +1,11 @@
+import Image from "next/image";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { ProductCard } from "@/components/product-card";
-import { HeroCarousel } from "@/components/hero-carousel";
 import { flattenProductColors } from "@/lib/colors";
+import { formatPrice } from "@/lib/format";
+import { whatsappContactLink } from "@/lib/whatsapp";
 import type { Category, Product } from "@/types/catalog";
 
 export default async function HomePage() {
@@ -14,33 +17,16 @@ export default async function HomePage() {
       .from("products")
       .select("id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))")
       .order("created_at", { ascending: false })
-      // A home só mostra uma amostra por seção (destaques, mais vistos, até
-      // 4 por categoria) — limitar a busca evita baixar o catálogo inteiro
-      // (que deve crescer para centenas de produtos) a cada carregamento.
+      // A home só mostra uma amostra por seção — limitar a busca evita
+      // baixar o catálogo inteiro (que deve crescer para centenas de
+      // produtos) a cada carregamento.
       .limit(120),
   ]);
 
   const allProducts = (products ?? []).map(flattenProductColors) as Product[];
-  const productsByCategory = new Map<string, Product[]>();
-  const semCategoria: Product[] = [];
-
   for (const product of allProducts) {
     product.images?.sort((a, b) => a.position - b.position);
-    if (product.category_id) {
-      const list = productsByCategory.get(product.category_id) ?? [];
-      list.push(product);
-      productsByCategory.set(product.category_id, list);
-    } else {
-      semCategoria.push(product);
-    }
   }
-
-  const categoriesList = (categories ?? []) as Category[];
-  const featured = allProducts.filter((product) => product.featured);
-  const maisVistos = allProducts
-    .filter((product) => product.view_count > 0)
-    .sort((a, b) => b.view_count - a.view_count)
-    .slice(0, 8);
 
   if (allProducts.length === 0) {
     return (
@@ -50,51 +36,174 @@ export default async function HomePage() {
     );
   }
 
+  const categoriesList = (categories ?? []) as Category[];
+  const countByCategory = new Map<string, number>();
+  for (const product of allProducts) {
+    if (product.category_id) {
+      countByCategory.set(product.category_id, (countByCategory.get(product.category_id) ?? 0) + 1);
+    }
+  }
+  const categoriasComProduto = categoriesList.filter((category) => (countByCategory.get(category.id) ?? 0) > 0);
+
+  const featured = allProducts.filter((product) => product.featured);
+  // O destaque do topo é o primeiro produto marcado como "destacar" (ou o
+  // mais recente, se nenhum estiver marcado). A faixa de "Escolha a sua"
+  // lista os destacados primeiro e completa com os mais recentes.
+  const spotlight = featured[0] ?? allProducts[0];
+  const spotlightCover = spotlight.images?.[0];
+  const strip = [...featured, ...allProducts.filter((product) => !product.featured)].slice(0, 10);
+  const maisVistos = allProducts
+    .filter((product) => product.view_count > 0)
+    .sort((a, b) => b.view_count - a.view_count)
+    .slice(0, 8);
+  const whatsapp = whatsappContactLink();
+
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-10 space-y-12">
-      <HeroCarousel products={featured} />
-
-      {maisVistos.length > 0 && (
-        <section>
-          <h2 className="mb-4 text-xl font-bold text-ink-50">Mais vistos</h2>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {maisVistos.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {categoriesList.map((category) => {
-        const items = productsByCategory.get(category.id) ?? [];
-        if (items.length === 0) return null;
-        return (
-          <section key={category.id}>
-            <div className="mb-4 flex items-baseline justify-between">
-              <h2 className="text-xl font-bold text-ink-50">{category.name}</h2>
-              <Link href={`/categoria/${category.slug}`} className="text-sm text-brand-500 hover:underline">
-                ver tudo
+    <div>
+      {/* Topo: texto à esquerda, peça em destaque num disco à direita */}
+      <section className="relative overflow-hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-32 -top-24 h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle,rgba(167,139,250,0.5),rgba(124,58,237,0.22)_45%,transparent_70%)] md:h-[760px] md:w-[760px]"
+        />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-10 md:grid-cols-[1.1fr_0.9fr] md:pb-24 md:pt-16">
+          <div>
+            <h1 className="text-5xl font-bold leading-[0.98] text-ink-50 md:text-7xl">
+              Peças impressas em 3D, <span className="text-brand-300">feitas para a sua casa.</span>
+            </h1>
+            <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-200">
+              Imagens sacras, decoração e peças personalizadas, feitas em São Paulo.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-5">
+              <Link
+                href="#catalogo"
+                className="rounded-[14px] bg-brand-700 px-6 py-3.5 font-semibold text-white transition-colors hover:bg-brand-800"
+              >
+                Ver catálogo
               </Link>
+              {whatsapp && (
+                <a
+                  href={whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border-b-2 border-brand-300 pb-0.5 font-semibold text-ink-50"
+                >
+                  Pedir no WhatsApp
+                </a>
+              )}
             </div>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {items.slice(0, 4).map((product) => (
-                <ProductCard key={product.id} product={product} />
+          </div>
+
+          <Link href={`/produto/${spotlight.slug}`} className="group relative mx-auto block w-full max-w-[420px] md:max-w-[480px]">
+            <div className="relative aspect-square overflow-hidden rounded-full border-[10px] border-white/10 bg-black shadow-[0_50px_100px_-30px_rgba(0,0,0,0.6)]">
+              {spotlightCover ? (
+                <Image
+                  src={spotlightCover.url}
+                  alt={spotlight.name}
+                  fill
+                  priority
+                  sizes="(min-width: 768px) 480px, 90vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-ink-400">Sem foto</div>
+              )}
+            </div>
+            <div className="absolute -right-2 bottom-8 rounded-[20px] bg-ink-50 px-5 py-4 text-ink-950 shadow-[0_20px_40px_-16px_rgba(0,0,0,0.5)] md:-right-4">
+              <b className="block font-[family-name:var(--font-heading)] text-lg">{spotlight.name}</b>
+              <span className="mt-1 block font-mono text-xl font-semibold text-brand-900">{formatPrice(spotlight.price)}</span>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* Parte clara: faixa de produtos, categorias, mais vistos e contato */}
+      <section id="catalogo" className="rounded-t-[48px] bg-[#f6f2fc] pb-16 pt-14 text-ink-950 md:pt-20">
+        <div className="mx-auto max-w-6xl px-4">
+          <h2 className="text-4xl font-bold md:text-6xl">Escolha a sua.</h2>
+          <p className="mt-3 max-w-lg text-[#4b3f66]">Deslize para ver as peças do catálogo.</p>
+
+          <ul className="-mx-4 mt-8 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-6 [scrollbar-width:none]">
+            {strip.map((product) => {
+              const cover = product.images?.[0];
+              return (
+                <li key={product.id} className="w-[240px] flex-none snap-start md:w-[300px]">
+                  <Link href={`/produto/${product.slug}`} className="group block">
+                    <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-black">
+                      {cover ? (
+                        <Image
+                          src={cover.url}
+                          alt={product.name}
+                          fill
+                          sizes="300px"
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-sm text-ink-400">Sem foto</div>
+                      )}
+                      <span className="absolute bottom-3 right-3 rounded-xl bg-ink-50 px-3.5 py-2 font-mono text-base font-bold text-ink-950">
+                        {formatPrice(product.price)}
+                      </span>
+                    </div>
+                    <h3 className="mt-4 text-xl font-semibold">{product.name}</h3>
+                    {product.size && <p className="mt-0.5 text-sm text-[#6b5f85]">{product.size}</p>}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          {categoriasComProduto.length > 0 && (
+            <div className="mt-10 border-t border-[#d6cce6]">
+              {categoriasComProduto.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/categoria/${category.slug}`}
+                  className="group flex items-center justify-between gap-6 border-b border-[#d6cce6] py-6 transition-[padding] duration-500 hover:pl-4 md:py-7"
+                >
+                  <div>
+                    <h3 className="text-3xl font-semibold md:text-5xl">{category.name}</h3>
+                    <p className="mt-1 text-[#6b5f85]">
+                      {countByCategory.get(category.id)} {countByCategory.get(category.id) === 1 ? "peça" : "peças"}
+                    </p>
+                  </div>
+                  <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-ink-950 text-white transition-colors group-hover:bg-brand-700 md:h-[52px] md:w-[52px]">
+                    <ArrowUpRight className="h-5 w-5" aria-hidden />
+                  </span>
+                </Link>
               ))}
             </div>
-          </section>
-        );
-      })}
+          )}
 
-      {semCategoria.length > 0 && (
-        <section>
-          <h2 className="mb-4 text-xl font-bold text-ink-50">Outros produtos</h2>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {semCategoria.slice(0, 4).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </section>
-      )}
+          {maisVistos.length > 0 && (
+            <div className="mt-14">
+              <h2 className="mb-5 text-3xl font-bold md:text-4xl">Mais vistos</h2>
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                {maisVistos.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {whatsapp && (
+            <div className="mt-16 grid items-center gap-8 rounded-[44px] bg-brand-700 bg-[radial-gradient(ellipse_60%_100%_at_100%_0%,rgba(255,255,255,0.22),transparent_60%)] p-8 text-white md:grid-cols-[1.4fr_1fr] md:p-16">
+              <div>
+                <h2 className="text-4xl font-bold md:text-5xl">Fale com a gente e receba um orçamento.</h2>
+                <p className="mt-3 max-w-md text-[#ece4fb]">Mande a peça que você quer e respondemos com cor, prazo e valor.</p>
+              </div>
+              <a
+                href={whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="justify-self-start rounded-[14px] bg-white px-7 py-4 font-semibold text-ink-950 md:justify-self-end"
+              >
+                Chamar no WhatsApp
+              </a>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

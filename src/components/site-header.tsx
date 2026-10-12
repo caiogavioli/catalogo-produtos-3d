@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Box, ChevronDown, Menu, Search, X } from "lucide-react";
+import { ChevronDown, Menu, Search, X } from "lucide-react";
 import type { Category } from "@/types/catalog";
 
 function SearchForm({ onSubmitted, className }: { onSubmitted?: () => void; className?: string }) {
@@ -90,9 +91,8 @@ export function SiteHeader({ categories }: { categories: Category[] }) {
       className="glass-card sticky top-0 z-20 border-x-0 border-t-0"
     >
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight text-ink-50">
-          <Box className="h-6 w-6 text-brand-500" strokeWidth={2.5} aria-hidden />
-          CMG3D
+        <Link href="/" aria-label="CMG3D Studio, página inicial">
+          <Image src="/logo.png" alt="CMG3D Studio" width={69} height={40} priority className="h-10 w-auto" />
         </Link>
 
         {/* Desktop */}

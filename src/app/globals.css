@@ -19,7 +19,8 @@
  * mas é o que mantém a leitura "100 claro / 900 escuro" consistente.
  */
 @theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   /* roxo metálico — acento único, do site inteiro */
@@ -35,12 +36,21 @@
   --color-steel-600: #656b7a;
 
   /* superfícies e texto — nuance violeta-acinzentada, não cinza puro */
-  --color-ink-50: #f4f3f7;
-  --color-ink-200: #cac7d3;
-  --color-ink-400: #928fa0;
-  --color-ink-800: #2e2b38;
-  --color-ink-900: #1c1a24;
-  --color-ink-950: #121016;
+  --color-ink-50: #f4effc;
+  --color-ink-200: #d5c8ee;
+  --color-ink-400: #a898c8;
+  --color-ink-800: #35205f;
+  --color-ink-900: #251049;
+  --color-ink-950: #1a0a38;
+}
+
+/* Títulos em Space Grotesk, com tracking apertado (visual C, 2026-10-12) */
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 
 body {

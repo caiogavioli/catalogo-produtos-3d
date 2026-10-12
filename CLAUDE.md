@@ -63,7 +63,7 @@ Não entra:
 
 ## Stack
 
-- Frontend: Next.js, Framer Motion (animações), Lucide (ícones).
+- Frontend: Next.js, Framer Motion (animações), Lucide (ícones), fontes Geist e Space Grotesk.
 - Hospedagem: Vercel, domínio `*.vercel.app` gratuito.
 - Banco de dados + autenticação + storage de imagens: Supabase (camada
   gratuita).
@@ -98,37 +98,33 @@ Editor do Supabase — não temos acesso automatizado ao banco de produção.
 
 ## Identidade visual
 
-Marca CMG3D. Logo fornecido pelo usuário — roxo/metálico, tipografia bold
-angular, ilustração de família na composição (ainda não salvo como
-arquivo no repo).
+Marca CMG3D. Logo (roxo/metálico, tipografia bold angular, ilustração de
+família) salvo em `public/logo.png`, usado no cabeçalho e no rodapé.
 
-Visual do site passou por duas rodadas no mesmo dia (2026-08-14). A v3
-testou uma pesquisa de mercado em catálogos de impressão 3D (MakerWorld,
-Printables, Bambu Store) que apontou o roxo-sobre-preto-com-glass como
-clichê genérico de SaaS — tentou trocar o acento por âmbar + ciano,
-reservando o roxo só pra 3 pontos de identidade. **O usuário não gostou**
-e pediu pra voltar tudo pro roxo. v4 (atual), estável:
+Histórico: a v3 (2026-08-14) tentou trocar o acento por âmbar + ciano e
+**o usuário não gostou**, pediu pra voltar tudo pro roxo. Em 2026-10-12 ele
+escolheu a "opção C" entre três propostas de redesign — **v5 (atual)**:
 
-- **Roxo metálico é o acento único do site inteiro** de novo — preço,
-  botões de ação, badge "Novo", links, foco e seleção. `brand-300`
-  (tom mais claro) marca foco/seleção; `brand-700` é o preenchimento
-  sólido de botão; `brand-900` marca estado ativo mais forte (ex.: aba
-  de ordenação selecionada). Tudo dentro da mesma família — não separar
-  de novo em acentos de cores diferentes sem pedido explícito.
-- **Cinza metálico** (`steel-*`) é a segunda voz, não um acento novo —
-  usado com moderação em texto técnico (ficha técnica do produto, rótulo
-  "(metálica)" no admin).
-- `ink-*` (superfícies/texto) tem uma leve nuance violeta-acinzentada em
-  vez de cinza puro, pra combinar com o roxo em vez de competir.
-- Sem glassmorphism — `.glass-card` (nome mantido por história) é
-  superfície sólida com um gradiente sutil de "metal escovado", não
-  vidro/blur.
-- Preço em fonte monoespaçada (`font-mono`), lendo como dado técnico.
-
-Fonte Inter (corpo/UI), ícones Lucide, pequenas animações de
-entrada/hover com Framer Motion, menu de categorias no cabeçalho. Tokens
-de cor em `src/app/globals.css`. Ajustar quando o logo real virar
-arquivo — pode influenciar o tom exato do roxo.
+- **Roxo continua sendo o acento único.** Tokens em `src/app/globals.css`:
+  `brand-300` foco/seleção, `brand-700` preenchimento de botão,
+  `brand-800` hover, `brand-900` estado ativo. Dourado só aparece nas
+  fotos dos produtos, nunca na interface.
+- **Fundo roxo escuro** (`ink-950` #1a0a38) em vez do cinza-violeta da v4;
+  `ink-*` inteiro foi puxado pra mais roxo. A home tem **uma** troca de
+  tema deliberada: topo escuro e uma seção clara (`#f6f2fc`, texto
+  `ink-950`) com cantos superiores arredondados. Não espalhar mais
+  seções claras sem pedido.
+- **Fontes:** Space Grotesk nos títulos (`h1`-`h3`, variável
+  `--font-heading`, tracking apertado) e Geist no corpo. Não usa mais
+  Inter.
+- **Home:** texto à esquerda + peça em destaque num disco à direita
+  (primeiro produto marcado "destacar", senão o mais recente), faixa
+  horizontal "Escolha a sua", categorias em linhas grandes, "Mais vistos"
+  (automático) e bloco de contato por WhatsApp. O carrossel autoplay
+  (`hero-carousel.tsx`) saiu da home; o componente ficou no repo sem uso.
+- Preço continua em fonte monoespaçada (`font-mono`); ícones Lucide.
+- Páginas internas (categoria, produto, busca, admin) herdam só as cores
+  e fontes novas; o layout delas não foi redesenhado.
 
 ## Convenções
 
