@@ -54,7 +54,8 @@ export default async function CategoriaPage({
   const { count: totalCount } = await supabase
     .from("products")
     .select("id", { count: "exact", head: true })
-    .eq("category_id", category.id);
+    .eq("category_id", category.id)
+    .eq("published", true);
   const totalPages = Math.max(1, Math.ceil((totalCount ?? 0) / PAGE_SIZE));
   if (page > totalPages) redirect(buildHref({ page: totalPages }));
 
@@ -65,6 +66,7 @@ export default async function CategoriaPage({
       "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))",
     )
     .eq("category_id", category.id)
+    .eq("published", true)
     // "Sob consulta" (preço em branco) sempre por último, nas duas direções
     // de ordenação por preço — sem isso o Postgres põe nulo primeiro no
     // "Maior preço", na frente dos produtos mais caros de verdade.

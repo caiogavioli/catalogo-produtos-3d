@@ -22,6 +22,7 @@ export default async function ProdutoPage({
       "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, category:categories(id, name, slug), images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))",
     )
     .eq("slug", slug)
+    .eq("published", true)
     .single();
 
   if (!product) notFound();

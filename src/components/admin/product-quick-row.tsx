@@ -17,6 +17,7 @@ export function ProductQuickRow({ product, categories }: { product: Product; cat
   const [categoryId, setCategoryId] = useState(product.category_id ?? "");
   const [colorMode, setColorMode] = useState(product.color_mode);
   const [featured, setFeatured] = useState(product.featured);
+  const [published, setPublished] = useState(product.published ?? true);
   const [price, setPrice] = useState(precoParaCampo(product.price));
   const [estado, setEstado] = useState<"" | "salvando" | "salvo" | string>("");
   const [, startTransition] = useTransition();
@@ -39,6 +40,9 @@ export function ProductQuickRow({ product, categories }: { product: Product; cat
     <tr className="border-b border-ink-950 align-middle">
       <td className="py-2 pr-2 font-medium text-ink-50">
         {product.name}
+        {!published && (
+          <span className="ml-2 rounded-full bg-ink-800 px-2 py-0.5 text-xs font-normal text-ink-200">Rascunho</span>
+        )}
         {estado && (
           <span className={`ml-2 text-xs ${estado.startsWith("Erro") ? "text-red-400" : "text-ink-400"}`}>
             {estado === "salvando" ? "salvando…" : estado === "salvo" ? "✓ salvo" : estado}
@@ -103,6 +107,19 @@ export function ProductQuickRow({ product, categories }: { product: Product; cat
             const anterior = featured;
             setFeatured(e.target.checked);
             salvar({ featured: e.target.checked }, () => setFeatured(anterior));
+          }}
+        />
+      </td>
+      <td className="py-2 pr-2 text-center">
+        <input
+          type="checkbox"
+          aria-label="Publicado"
+          className="h-5 w-5 accent-[var(--color-brand-700)]"
+          checked={published}
+          onChange={(e) => {
+            const anterior = published;
+            setPublished(e.target.checked);
+            salvar({ published: e.target.checked }, () => setPublished(anterior));
           }}
         />
       </td>

@@ -8,7 +8,7 @@ export default async function AdminProdutosPage() {
   const [{ data: products }, { data: categories }] = await Promise.all([
     supabase
       .from("products")
-      .select("id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at")
+      .select("id, name, slug, description, size, price, category_id, featured, published, makerworld_id, view_count, color_mode, created_at")
       .order("created_at", { ascending: false }),
     supabase.from("categories").select("id, name, slug").order("name"),
   ]);
@@ -37,6 +37,7 @@ export default async function AdminProdutosPage() {
               <th className="py-2">Cores</th>
               <th className="py-2">Preço</th>
               <th className="py-2 text-center">Destaque</th>
+              <th className="py-2 text-center">Publicado</th>
               <th className="py-2" />
             </tr>
           </thead>
