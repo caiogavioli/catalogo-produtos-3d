@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { syncModelProduct } from "@/app/admin/actions";
 
 type Status = "q" | "t";
 // [id, nome, índices das coleções, (reservado), slug, caminho da foto]
@@ -24,6 +25,8 @@ export function EscolhaModelos({ userId }: { userId: string }) {
   const [colecao, setColecao] = useState(-1);
   const [filtro, setFiltro] = useState<"todos" | "meus" | "ela" | "sem">("todos");
   const [pagina, setPagina] = useState(0);
+  const [aviso, setAviso] = useState<string | null>(null);
+  const [criando, setCriando] = useState(false);
 
   const carregarPicks = useCallback(async () => {
     const { data, error } = await supabase.from("model_picks").select("model_id, user_id, user_email, status");
@@ -76,6 +79,32 @@ export function EscolhaModelos({ userId }: { userId: string }) {
   const paginaAtual = Math.min(pagina, totalPaginas - 1);
   const visiveis = filtrados.slice(paginaAtual * POR_PAGINA, (paginaAtual + 1) * POR_PAGINA);
 
+  async function sincronizar(m: Modelo) {
+    const r = await syncModelProduct({ id: m[0], name: m[1], photoPath: m[5] });
+    if (r.error) setAviso(`Marcação salva, mas o rascunho falhou: ${r.error}`);
+    else if (r.status === "criado") setAviso(r.aviso ? `Rascunho criado sem foto (${r.aviso})` : "Rascunho criado em Produtos");
+    else if (r.status === "mantido") setAviso("Esse produto já foi editado, então continua na lista de Produtos");
+    else if (r.status === "removido") setAviso("Rascunho removido");
+    return r;
+  }
+
+  async function criarRascunhosDosQuero() {
+    if (!dados) return;
+    setCriando(true);
+    setAviso(null);
+    const ids = new Set(picks.filter((p) => p.status === "q").map((p) => p.model_id));
+    let criados = 0;
+    let falhas = 0;
+    for (const m of dados.d) {
+      if (!ids.has(m[0])) continue;
+      const r = await syncModelProduct({ id: m[0], name: m[1], photoPath: m[5] });
+      if (r.error) falhas++;
+      else if (r.status === "criado") criados++;
+    }
+    setCriando(false);
+    setAviso(`${criados} rascunho(s) criado(s)${falhas ? `, ${falhas} com erro` : ""}`);
+  }
+
   async function marcar(m: Modelo, status: Status) {
     const minha = picks.find((p) => p.model_id === m[0] && p.user_id === userId);
     const anterior = picks;
@@ -85,7 +114,9 @@ export function EscolhaModelos({ userId }: { userId: string }) {
       if (error) {
         setPicks(anterior);
         setErro(error.message);
+        return;
       }
+      if (minha.status === "q") await sincronizar(m);
       return;
     }
     const { data: auth } = await supabase.auth.getUser();
@@ -97,7 +128,10 @@ export function EscolhaModelos({ userId }: { userId: string }) {
     if (error) {
       setPicks(anterior);
       setErro(error.message);
+      return;
     }
+    // Quero cria o rascunho; trocar de Quero para Talvez remove o rascunho intocado.
+    if (status === "q" || minha?.status === "q") await sincronizar(m);
   }
 
   function copiarLista() {
@@ -124,6 +158,9 @@ export function EscolhaModelos({ userId }: { userId: string }) {
 
   return (
     <div>
+      {aviso && (
+        <p className="mb-3 rounded-lg border border-ink-800 bg-ink-900 p-3 text-sm text-ink-50">{aviso}</p>
+      )}
       {erro && <p className="mb-3 rounded-lg border border-red-900 bg-red-950 p-3 text-sm text-red-300">{erro}</p>}
 
       <div className="sticky top-0 z-10 -mx-4 mb-4 space-y-2 border-b border-ink-800 bg-ink-950/95 px-4 py-3 backdrop-blur">
@@ -170,9 +207,18 @@ export function EscolhaModelos({ userId }: { userId: string }) {
           <span>
             {filtrados.length} modelos · eu: {minhasQ} quero, {minhasT} talvez · outro: {dela}
           </span>
-          <button onClick={copiarLista} className="text-brand-500 hover:text-brand-300">
-            Copiar lista
-          </button>
+          <span className="flex gap-3">
+            <button
+              onClick={criarRascunhosDosQuero}
+              disabled={criando || minhasQ + dela === 0}
+              className="text-brand-500 hover:text-brand-300 disabled:opacity-40"
+            >
+              {criando ? "Criando…" : "Criar rascunhos dos Quero"}
+            </button>
+            <button onClick={copiarLista} className="text-brand-500 hover:text-brand-300">
+              Copiar lista
+            </button>
+          </span>
         </div>
       </div>
 

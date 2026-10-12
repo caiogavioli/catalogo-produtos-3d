@@ -253,6 +253,7 @@ export async function updateProduct(
 export type QuickProductPatch = {
   category_id?: string | null;
   featured?: boolean;
+  published?: boolean;
   color_mode?: "unica" | "varias";
   price?: string | null;
 };
@@ -266,6 +267,7 @@ export async function quickUpdateProduct(id: string, patch: QuickProductPatch): 
 
   if ("category_id" in patch) update.category_id = patch.category_id || null;
   if ("featured" in patch) update.featured = Boolean(patch.featured);
+  if ("published" in patch) update.published = Boolean(patch.published);
   if ("color_mode" in patch) update.color_mode = patch.color_mode === "varias" ? "varias" : "unica";
   if ("price" in patch) {
     const raw = (patch.price ?? "").trim();
@@ -284,7 +286,102 @@ export async function quickUpdateProduct(id: string, patch: QuickProductPatch): 
 
   revalidatePath("/");
   revalidatePath("/categoria", "layout");
+  revalidatePath("/busca");
   return {};
+}
+
+const MAKERWORLD_IMAGE_BASE = "https://makerworld.bblmw.com/makerworld/model/";
+
+export type SyncModelResult = {
+  status: "criado" | "existe" | "removido" | "mantido" | "nada";
+  error?: string;
+  aviso?: string;
+};
+
+// Mantém o produto-rascunho de um modelo do MakerWorld em sincronia com as
+// marcações "Quero" da página /admin/escolha: se alguém (o dono ou a
+// esposa) quer o modelo, existe um produto rascunho com o nome e a foto
+// dele; se ninguém quer mais, o rascunho some, desde que ninguém tenha
+// mexido nele (categoria, preço, descrição ou publicação) — senão ele fica.
+export async function syncModelProduct(model: {
+  id: number;
+  name: string;
+  photoPath: string;
+}): Promise<SyncModelResult> {
+  const supabase = await requireAdmin();
+  const name = model.name.trim();
+  if (!Number.isInteger(model.id) || !name || name.length > 200) {
+    return { status: "nada", error: "Modelo inválido." };
+  }
+
+  const { count } = await supabase
+    .from("model_picks")
+    .select("model_id", { count: "exact", head: true })
+    .eq("model_id", model.id)
+    .eq("status", "q");
+  const wanted = (count ?? 0) > 0;
+
+  const { data: existing } = await supabase
+    .from("products")
+    .select("id, published, category_id, price, description")
+    .eq("makerworld_id", model.id)
+    .maybeSingle();
+
+  if (!wanted) {
+    if (!existing) return { status: "nada" };
+    const intacto =
+      !existing.published && !existing.category_id && existing.price === null && !existing.description;
+    if (!intacto) return { status: "mantido" };
+
+    const { data: images } = await supabase.from("product_images").select("url").eq("product_id", existing.id);
+    const { error } = await supabase.from("products").delete().eq("id", existing.id);
+    if (error) return { status: "nada", error: error.message };
+    if (images && images.length > 0) await removeStorageFiles(images.map((image) => image.url));
+    revalidatePath("/admin");
+    return { status: "removido" };
+  }
+
+  if (existing) return { status: "existe" };
+
+  const slug = await uniqueSlug(supabase, "products", slugify(name));
+  const { data: product, error } = await supabase
+    .from("products")
+    .insert({ name, slug, makerworld_id: model.id, published: false })
+    .select("id")
+    .single();
+  if (error || !product) {
+    // outra pessoa marcou ao mesmo tempo e o produto já foi criado
+    if (error?.code === "23505") return { status: "existe" };
+    return { status: "nada", error: error?.message ?? "Não foi possível criar o rascunho." };
+  }
+
+  let aviso: string | undefined;
+  try {
+    if (!/^[A-Za-z0-9_\-./]+$/.test(model.photoPath) || model.photoPath.includes("..")) {
+      throw new Error("caminho de foto inválido");
+    }
+    const response = await fetch(
+      `${MAKERWORLD_IMAGE_BASE}${model.photoPath}?x-oss-process=image/resize,w_1200/format,webp`,
+      { headers: { "user-agent": "Mozilla/5.0" }, signal: AbortSignal.timeout(8000) },
+    );
+    if (!response.ok) throw new Error(`MakerWorld respondeu ${response.status}`);
+    const bytes = await response.arrayBuffer();
+    const path = `${product.id}/${Date.now()}-makerworld.webp`;
+    const { error: uploadError } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(path, bytes, { contentType: "image/webp" });
+    if (uploadError) throw new Error(uploadError.message);
+    const { data: publicUrl } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    const { error: imageError } = await supabase
+      .from("product_images")
+      .insert({ product_id: product.id, url: publicUrl.publicUrl, position: 0 });
+    if (imageError) throw new Error(imageError.message);
+  } catch (photoError) {
+    aviso = `Rascunho criado sem foto (${photoError instanceof Error ? photoError.message : "erro ao baixar"}). Suba a foto na edição.`;
+  }
+
+  revalidatePath("/admin");
+  return { status: "criado", aviso };
 }
 
 export async function deleteProductImage(imageId: string) {

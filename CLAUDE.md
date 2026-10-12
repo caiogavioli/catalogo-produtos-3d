@@ -36,6 +36,15 @@ Entra:
   `public/dados/modelos-makerworld.json`) pra montar a seção "Sob
   encomenda". Marcações por usuário na tabela `model_picks`
   (`supabase/migration-escolha-modelos.sql`, já rodada em produção).
+  Clicar "Quero" cria sozinho um **rascunho** de produto (`published =
+  false`, invisível no site público) com o nome e a foto do MakerWorld
+  copiada pro storage (`syncModelProduct` em `src/app/admin/actions.ts`;
+  `products.makerworld_id` evita duplicar). Descrição fica em branco —
+  não há raspagem do MakerWorld. O dono completa categoria/cores/preço e
+  marca "Publicado" na lista de produtos. Tirar o Quero apaga o
+  rascunho só se ele não foi editado. Schema em
+  `supabase/migration-rascunhos-makerworld.sql` (rodar ANTES do deploy:
+  as consultas públicas filtram `published`).
 - Busca por nome de produto (`/busca`), com paginação.
 - Página de categoria com ordenação (recentes/preço) e paginação —
   necessário desde que o usuário avisou que o catálogo vai crescer pra

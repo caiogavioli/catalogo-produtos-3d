@@ -22,6 +22,8 @@ export type Product = {
   price: number | null;
   category_id: string | null;
   featured: boolean;
+  published?: boolean;
+  makerworld_id?: number | null;
   view_count: number;
   color_mode: ColorMode;
   created_at: string;

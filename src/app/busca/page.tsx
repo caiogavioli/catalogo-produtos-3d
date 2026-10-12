@@ -28,7 +28,8 @@ export default async function BuscaPage({
   const { count: totalCount } = await supabase
     .from("products")
     .select("id", { count: "exact", head: true })
-    .ilike("name", `%${query}%`);
+    .ilike("name", `%${query}%`)
+    .eq("published", true);
   const totalPages = Math.max(1, Math.ceil((totalCount ?? 0) / PAGE_SIZE));
   if (page > totalPages) {
     redirect(`/busca?q=${encodeURIComponent(query)}&page=${totalPages}`);
@@ -41,6 +42,7 @@ export default async function BuscaPage({
       "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))",
     )
     .ilike("name", `%${query}%`)
+    .eq("published", true)
     .order("created_at", { ascending: false })
     .range(from, to);
 
