@@ -43,7 +43,7 @@ Entra:
   Clicar "Quero" cria sozinho um **rascunho** de produto (`published =
   false`, invisível no site público) com o nome e a foto do MakerWorld
   copiada pro storage (`syncModelProduct` em `src/app/admin/actions.ts`;
-  `products.makerworld_id` evita duplicar). Descrição fica em branco —
+  `products.makerworld_id` evita duplicar). Tenta trazer até 5 fotos do modelo (capa + extras lidas da API/página do MakerWorld, melhor esforço — se bloquear, fica só a capa); na edição do produto, "Usar como capa" escolhe a foto principal (posição 0) e "Buscar mais fotos do MakerWorld" tenta de novo. Descrição fica em branco —
   não há raspagem do MakerWorld. O dono completa categoria/cores/preço e
   marca "Publicado" na lista de produtos. Tirar o Quero apaga o
   rascunho só se ele não foi editado. Schema em

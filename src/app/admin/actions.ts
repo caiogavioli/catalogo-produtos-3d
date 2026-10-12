@@ -344,7 +344,176 @@ export type SyncModelResult = {
   status: "criado" | "existe" | "removido" | "mantido" | "nada";
   error?: string;
   aviso?: string;
+  fotos?: number;
 };
+
+const MAX_PHOTOS = 5;
+
+type AdminClient = Awaited<ReturnType<typeof requireAdmin>>;
+
+function isSafePhotoPath(path: string) {
+  return /^[A-Za-z0-9_\-./]+$/.test(path) && !path.includes("..");
+}
+
+function collectPictureUrls(node: unknown, found: string[], depth = 0) {
+  if (depth > 12 || !node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    for (const item of node) collectPictureUrls(item, found, depth + 1);
+    return;
+  }
+  for (const [key, value] of Object.entries(node)) {
+    if (/^(designPictures|design_pictures)$/.test(key) && Array.isArray(value)) {
+      for (const item of value) {
+        const url = typeof item === "string" ? item : (item as { url?: unknown })?.url;
+        if (typeof url === "string") found.push(url);
+      }
+    } else {
+      collectPictureUrls(value, found, depth + 1);
+    }
+  }
+}
+
+// Tenta descobrir as fotos extras de um modelo do MakerWorld. Melhor
+// esforço: o site não tem API oficial e pode bloquear o servidor — nesse caso
+// devolve lista vazia e quem chamou segue só com a capa.
+async function fetchMakerworldPhotoPaths(modelId: number): Promise<string[]> {
+  const headers = { "user-agent": "Mozilla/5.0", accept: "application/json,text/html" };
+  const urls: string[] = [];
+  const sources = [
+    { url: `https://makerworld.com/api/v1/design-service/design/${modelId}`, json: true },
+    { url: `https://makerworld.com/en/models/${modelId}`, json: false },
+  ];
+  for (const source of sources) {
+    try {
+      const response = await fetch(source.url, { headers, signal: AbortSignal.timeout(8000) });
+      if (!response.ok) continue;
+      const text = await response.text();
+      let data: unknown = null;
+      if (source.json) {
+        data = JSON.parse(text);
+      } else {
+        const match = text.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+        if (match) data = JSON.parse(match[1]);
+      }
+      collectPictureUrls(data, urls);
+      if (urls.length > 0) break;
+    } catch {
+      // tenta a próxima fonte
+    }
+  }
+
+  const paths: string[] = [];
+  for (const raw of urls) {
+    try {
+      const parsed = new URL(raw);
+      const marker = "/makerworld/model/";
+      if (parsed.hostname !== "makerworld.bblmw.com" || !parsed.pathname.startsWith(marker)) continue;
+      const path = decodeURIComponent(parsed.pathname.slice(marker.length));
+      if (isSafePhotoPath(path) && !paths.includes(path)) paths.push(path);
+    } catch {
+      // url inválida, ignora
+    }
+  }
+  return paths;
+}
+
+// Baixa as fotos do MakerWorld (em paralelo), sobe no storage e grava em
+// product_images a partir de startPosition. Devolve quantas deram certo.
+async function attachMakerworldPhotos(
+  supabase: AdminClient,
+  productId: string,
+  photoPaths: string[],
+  startPosition: number,
+): Promise<number> {
+  const stamp = Date.now();
+  const results = await Promise.all(
+    photoPaths.map(async (photoPath, index) => {
+      try {
+        const response = await fetch(
+          `${MAKERWORLD_IMAGE_BASE}${photoPath}?x-oss-process=image/resize,w_1200/format,webp`,
+          { headers: { "user-agent": "Mozilla/5.0" }, signal: AbortSignal.timeout(8000) },
+        );
+        if (!response.ok) return null;
+        const bytes = await response.arrayBuffer();
+        const base = (photoPath.split("/").pop() ?? "foto").replace(/\.[A-Za-z0-9]+$/, "").replace(/[^A-Za-z0-9_-]/g, "");
+        const path = `${productId}/${stamp}-${index}-mw-${base}.webp`;
+        const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, bytes, { contentType: "image/webp" });
+        if (error) return null;
+        return supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  const urls = results.filter((url): url is string => Boolean(url));
+  if (urls.length === 0) return 0;
+  const rows = urls.map((url, index) => ({ product_id: productId, url, position: startPosition + index }));
+  const { error } = await supabase.from("product_images").insert(rows);
+  if (error) {
+    await removeStorageFiles(urls);
+    throw new Error(error.message);
+  }
+  return urls.length;
+}
+
+// Define qual foto é a capa: ela vai pra posição 0 e as outras seguem na
+// ordem atual.
+export async function setCoverImage(imageId: string) {
+  const supabase = await requireAdmin();
+  const { data: image } = await supabase.from("product_images").select("product_id").eq("id", imageId).single();
+  if (!image) return;
+  const { data: images } = await supabase
+    .from("product_images")
+    .select("id")
+    .eq("product_id", image.product_id)
+    .order("position");
+  const ordered = [imageId, ...(images ?? []).map((row) => row.id).filter((id) => id !== imageId)];
+  await Promise.all(
+    ordered.map((id, position) => supabase.from("product_images").update({ position }).eq("id", id)),
+  );
+  revalidatePath("/admin");
+  revalidatePath("/");
+}
+
+export type MoreMakerworldPhotosResult = { error?: string; adicionadas?: number; aviso?: string };
+
+// Botão "Buscar mais fotos do MakerWorld" na edição do produto: completa até
+// 5 fotos com as que ainda não estão no produto.
+export async function fetchMoreMakerworldPhotos(productId: string): Promise<MoreMakerworldPhotosResult> {
+  const supabase = await requireAdmin();
+  const { data: product } = await supabase.from("products").select("makerworld_id").eq("id", productId).single();
+  if (!product?.makerworld_id) return { error: "Este produto não veio do MakerWorld." };
+
+  const { data: current } = await supabase
+    .from("product_images")
+    .select("url, position")
+    .eq("product_id", productId)
+    .order("position", { ascending: false });
+  const have = current?.length ?? 0;
+  if (have >= MAX_PHOTOS) return { error: `Já tem ${MAX_PHOTOS} fotos. Remova alguma antes.` };
+
+  const found = await fetchMakerworldPhotoPaths(product.makerworld_id);
+  const known = (current ?? []).map((row) => row.url);
+  const fresh = found.filter((path) => {
+    const base = (path.split("/").pop() ?? "").replace(/\.[A-Za-z0-9]+$/, "").replace(/[^A-Za-z0-9_-]/g, "");
+    return !known.some((url) => url.includes(`-mw-${base}.webp`));
+  });
+  if (found.length === 0) {
+    return { aviso: "O MakerWorld não deixou o site buscar as fotos. Suba as fotos manualmente (até 5)." };
+  }
+  if (fresh.length === 0) return { adicionadas: 0, aviso: "Não há fotos novas desse modelo." };
+
+  const added = await attachMakerworldPhotos(
+    supabase,
+    productId,
+    fresh.slice(0, MAX_PHOTOS - have),
+    (current?.[0]?.position ?? -1) + 1,
+  );
+  revalidatePath("/admin");
+  revalidatePath("/");
+  return { adicionadas: added };
+}
 
 // Mantém o produto-rascunho de um modelo do MakerWorld em sincronia com as
 // marcações "Quero" da página /admin/escolha: se alguém (o dono ou a
@@ -404,32 +573,21 @@ export async function syncModelProduct(model: {
   }
 
   let aviso: string | undefined;
+  let fotos = 0;
   try {
-    if (!/^[A-Za-z0-9_\-./]+$/.test(model.photoPath) || model.photoPath.includes("..")) {
-      throw new Error("caminho de foto inválido");
-    }
-    const response = await fetch(
-      `${MAKERWORLD_IMAGE_BASE}${model.photoPath}?x-oss-process=image/resize,w_1200/format,webp`,
-      { headers: { "user-agent": "Mozilla/5.0" }, signal: AbortSignal.timeout(8000) },
-    );
-    if (!response.ok) throw new Error(`MakerWorld respondeu ${response.status}`);
-    const bytes = await response.arrayBuffer();
-    const path = `${product.id}/${Date.now()}-makerworld.webp`;
-    const { error: uploadError } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .upload(path, bytes, { contentType: "image/webp" });
-    if (uploadError) throw new Error(uploadError.message);
-    const { data: publicUrl } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-    const { error: imageError } = await supabase
-      .from("product_images")
-      .insert({ product_id: product.id, url: publicUrl.publicUrl, position: 0 });
-    if (imageError) throw new Error(imageError.message);
+    if (!isSafePhotoPath(model.photoPath)) throw new Error("caminho de foto inválido");
+    // A capa do modelo vem primeiro (posição 0); as outras fotos são
+    // tentativa — se o MakerWorld não responder, fica só a capa.
+    const extras = await fetchMakerworldPhotoPaths(model.id);
+    const paths = [model.photoPath, ...extras.filter((path) => path !== model.photoPath)].slice(0, MAX_PHOTOS);
+    fotos = await attachMakerworldPhotos(supabase, product.id, paths, 0);
+    if (fotos === 0) throw new Error("nenhuma foto baixou");
   } catch (photoError) {
     aviso = `Rascunho criado sem foto (${photoError instanceof Error ? photoError.message : "erro ao baixar"}). Suba a foto na edição.`;
   }
 
   revalidatePath("/admin");
-  return { status: "criado", aviso };
+  return { status: "criado", aviso, fotos };
 }
 
 export async function deleteProductImage(imageId: string) {

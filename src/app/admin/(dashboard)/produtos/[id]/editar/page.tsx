@@ -17,7 +17,7 @@ export default async function EditarProdutoPage({
     supabase
       .from("products")
       .select(
-        "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))",
+        "id, name, slug, description, size, price, category_id, featured, view_count, color_mode, makerworld_id, created_at, images:product_images(id, product_id, url, position), product_colors(color:colors(id, name, hex, metallic))",
       )
       .eq("id", id)
       .single(),

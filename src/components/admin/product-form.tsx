@@ -1,7 +1,12 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { deleteProductImage, type ActionState } from "@/app/admin/actions";
+import {
+  deleteProductImage,
+  fetchMoreMakerworldPhotos,
+  setCoverImage,
+  type ActionState,
+} from "@/app/admin/actions";
 import { colorSwatchStyle } from "@/lib/colors";
 import { PhotoSlots } from "@/components/admin/photo-slots";
 import type { Category, Color, Product } from "@/types/catalog";
@@ -26,6 +31,20 @@ export function ProductForm({
   );
   const marcarTodas = () => setSelectedColorIds(new Set(colors.map((color) => color.id)));
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+  const [buscandoFotos, setBuscandoFotos] = useState(false);
+  const [avisoFotos, setAvisoFotos] = useState<string | null>(null);
+  async function buscarMaisFotos() {
+    if (!product) return;
+    setBuscandoFotos(true);
+    setAvisoFotos(null);
+    try {
+      const r = await fetchMoreMakerworldPhotos(product.id);
+      setAvisoFotos(r.error ?? r.aviso ?? `${r.adicionadas ?? 0} foto(s) adicionada(s).`);
+    } catch {
+      setAvisoFotos("Não deu pra buscar agora. Suba as fotos manualmente.");
+    }
+    setBuscandoFotos(false);
+  }
 
   return (
     <>
@@ -199,7 +218,7 @@ export function ProductForm({
         <div>
           <p className="block text-sm font-medium text-ink-200">Fotos atuais</p>
           <div className="mt-2 grid grid-cols-4 gap-2">
-            {product.images.map((image) => (
+            {product.images.map((image, index) => (
               <div key={image.id} className="relative aspect-square">
                 <button
                   type="button"
@@ -225,9 +244,38 @@ export function ProductForm({
                     ×
                   </button>
                 </form>
+                {index === 0 ? (
+                  <span className="absolute bottom-1 left-1 rounded bg-brand-700 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                    Capa
+                  </span>
+                ) : (
+                  <form action={setCoverImage.bind(null, image.id)} className="absolute bottom-1 left-1">
+                    <button
+                      type="submit"
+                      className="rounded bg-black/70 px-1.5 py-0.5 text-[10px] text-white hover:bg-black/90"
+                    >
+                      Usar como capa
+                    </button>
+                  </form>
+                )}
               </div>
             ))}
           </div>
+          <p className="mt-2 text-xs text-ink-400">A foto com “Capa” é a que aparece primeiro no site.</p>
+        </div>
+      )}
+
+      {product?.makerworld_id && (product.images?.length ?? 0) < 5 && (
+        <div>
+          <button
+            type="button"
+            onClick={buscarMaisFotos}
+            disabled={buscandoFotos}
+            className="rounded-lg border border-ink-800 px-3 py-2 text-sm text-ink-100 hover:bg-ink-900 disabled:opacity-60"
+          >
+            {buscandoFotos ? "Buscando…" : "Buscar mais fotos do MakerWorld"}
+          </button>
+          {avisoFotos && <p className="mt-2 text-sm text-ink-200">{avisoFotos}</p>}
         </div>
       )}
 

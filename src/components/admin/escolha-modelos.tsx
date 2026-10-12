@@ -82,7 +82,7 @@ export function EscolhaModelos({ userId }: { userId: string }) {
   async function sincronizar(m: Modelo) {
     const r = await syncModelProduct({ id: m[0], name: m[1], photoPath: m[5] });
     if (r.error) setAviso(`Marcação salva, mas o rascunho falhou: ${r.error}`);
-    else if (r.status === "criado") setAviso(r.aviso ? `Rascunho criado sem foto (${r.aviso})` : "Rascunho criado em Produtos");
+    else if (r.status === "criado") setAviso(r.aviso ?? `Rascunho criado em Produtos com ${r.fotos ?? 1} foto(s). Escolha a capa na edição.`);
     else if (r.status === "mantido") setAviso("Esse produto já foi editado, então continua na lista de Produtos");
     else if (r.status === "removido") setAviso("Rascunho removido");
     return r;
