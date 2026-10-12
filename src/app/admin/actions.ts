@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
@@ -31,6 +32,39 @@ export async function login(_prevState: ActionState, formData: FormData): Promis
   if (error) {
     return { error: "E-mail ou senha inválidos." };
   }
+
+  redirect("/admin");
+}
+
+// "Esqueci minha senha": manda o e-mail com o link de redefinição. A
+// resposta é sempre a mesma, exista o e-mail ou não, pra ninguém usar o
+// formulário pra descobrir quais e-mails têm login.
+export async function requestPasswordReset(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+  const email = String(formData.get("email") ?? "").trim();
+  if (!email) return { error: "Informe o e-mail." };
+
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${proto}://${host}/auth/callback?next=/admin/redefinir-senha`,
+  });
+  if (error && error.status === 429) return { error: "Muitos pedidos seguidos. Espere alguns minutos e tente de novo." };
+  return { success: true };
+}
+
+// Tela de nova senha: só chega aqui quem abriu o link do e-mail (a sessão
+// de recuperação vem do /auth/callback); o middleware barra o resto.
+export async function updatePassword(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+  if (password.length < 8) return { error: "A senha precisa ter pelo menos 8 caracteres." };
+  if (password !== confirm) return { error: "As duas senhas não são iguais." };
+
+  const supabase = await requireAdmin();
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: "Não consegui salvar a senha. Peça um novo link e tente de novo." };
 
   redirect("/admin");
 }
